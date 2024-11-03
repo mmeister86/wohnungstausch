@@ -1,7 +1,7 @@
 "use client"
-import Header from "@/components/ui/header"
-import Main from "@/components/ui/main"
-import Footer from "@/components/ui/footer"
+import Header from "@/components/header"
+import Main from "@/components/main"
+import Footer from "@/components/footer"
 import * as React from "react"
 
 export default function LandingPage() {
