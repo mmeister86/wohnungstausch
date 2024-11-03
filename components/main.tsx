@@ -1,10 +1,10 @@
+"use client"
 import WohnungsCard from "@/components/wohnungen/wohnungs-karte"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import * as React from "react"
 
 export default function Main() {
-
   return (
     <main className="flex-grow">
       <section className="py-20 sm:py-32">
