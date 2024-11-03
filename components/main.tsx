@@ -1,5 +1,4 @@
 "use client"
-import WohnungsCard from "@/components/wohnungen/wohnungs-karte"
 import WohnungsCardHorizontal from "@/components/wohnungen/wohnungs-karte-horizontal"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"

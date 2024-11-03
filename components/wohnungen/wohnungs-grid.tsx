@@ -1,3 +1,4 @@
+"use client"
 import WohnungsCard from "./wohnungs-karte" 
 
 export default function WohnungsGrid() {
