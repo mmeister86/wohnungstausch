@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import Modal from "@/components/ui/modal"
 import WohnungstauschFormular from "@/components/wohnungen/wohnungs-formular"
 import * as React from "react"
+import Link from "next/link"
 
 export default function Main() {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
@@ -13,8 +14,8 @@ export default function Main() {
   const closeModal = () => setIsModalOpen(false)
 
   return (
-    <main className="flex-grow">
-      <section className="py-20 sm:py-32">
+    <main className="flex-grow" >
+      <section className="py-20 sm:py-32 bg-white  bg-[radial-gradient(100%_50%_at_50%_0%,rgba(0,163,255,0.13)_0,rgba(0,163,255,0)_50%,rgba(0,163,255,0)_100%)]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="max-w-[38rem]">
@@ -34,37 +35,70 @@ export default function Main() {
               </div>
             </div>
             <div className="lg:justify-self-end">
-              <Image
-                src="/Arpartment.png"
-                alt="Wohnungstausch Illustration"
-                width={600}
-                height={500}
-                className="w-full max-w-[600px] h-auto"
-                priority
-              />
+              <div className="relative w-full max-w-[600px] aspect-[6/5]">
+                <Image
+                  src="/Apartment.png"
+                  alt="Wohnungstausch Illustration"
+                  width={600}
+                  height={500}
+                  className="w-full max-w-[600px] h-auto"
+                  priority
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* So funktioniert's Sektion - Neu strukturiert mit 2 Spalten */}
       <section className="py-20 sm:py-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl mx-auto lg:max-w-none">
-            <h2 className="text-3xl font-bold tracking-tight text-black dark:text-white sm:text-4xl text-center">So funktioniert&apos;s</h2>
-            <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-3">
+          <h2 className="text-3xl font-bold tracking-tight text-black dark:text-white sm:text-4xl text-center mb-16">
+            So funktioniert&apos;s
+          </h2>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Linke Spalte - Bild */}
+            <div className="flex justify-center">
+              <div className="relative w-full max-w-[500px] aspect-[5/4]">
+                <Image
+                  src="/Howitworks.png"
+                  alt="So funktioniert der Wohnungstausch"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 500px"
+                  style={{ objectFit: 'contain' }}
+                  className="rounded-lg"
+                  quality={90}
+                />
+              </div>
+            </div>
+            {/* Rechte Spalte - 4 Schritte */}
+            <div className="space-y-8">
               {[
-                "Erstellen Sie Ihr Wohnungsangebot",
-                "Finden Sie passende Tauschangebote",
-                "Organisieren Sie den Wohnungstausch",
+                {
+                  title: "Erstellen Sie Ihr Wohnungsangebot",
+                  description: "Beschreiben Sie Ihre aktuelle Wohnung und Ihre Wunschwohnung detailliert."
+                },
+                {
+                  title: "Finden Sie passende Tauschangebote",
+                  description: "Durchsuchen Sie die verfügbaren Angebote nach Ihren Kriterien."
+                },
+                {
+                  title: "Kontaktieren Sie potenzielle Tauschpartner",
+                  description: "Treten Sie direkt mit interessanten Tauschpartnern in Kontakt."
+                },
+                {
+                  title: "Organisieren Sie den Wohnungstausch",
+                  description: "Klären Sie alle Details und wickeln Sie den Tausch sicher ab."
+                }
               ].map((step, index) => (
-                <div key={index} className="relative">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-black dark:bg-white">
+                <div key={index} className="relative flex items-start">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-black dark:bg-white">
                     <span className="text-sm font-semibold text-white dark:text-black">{index + 1}</span>
                   </div>
-                  <h3 className="mt-6 text-lg font-semibold text-black dark:text-white">{step}</h3>
-                  <p className="mt-2 text-base text-gray-600 dark:text-gray-400">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  </p>
+                  <div className="ml-4">
+                    <h3 className="text-lg font-semibold text-black dark:text-white">{step.title}</h3>
+                    <p className="mt-2 text-base text-gray-600 dark:text-gray-400">{step.description}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -73,7 +107,7 @@ export default function Main() {
       </section>
 
       <section className="py-20 sm:py-32 bg-gray-50 dark:bg-gray-900">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold tracking-tight text-black dark:text-white sm:text-4xl text-center mb-16">
               Aktuelle Wohnungsangebote
             </h2>
@@ -87,9 +121,11 @@ export default function Main() {
               ))}
             </div>
             <div className="text-center mt-12">
+              <Link href="/wohnungen">
               <Button variant="outline" className="h-11 px-6 text-sm font-medium">
                 Alle Angebote anzeigen
               </Button>
+              </Link>
             </div>
           </div>
         </section>
