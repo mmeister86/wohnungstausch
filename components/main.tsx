@@ -1,24 +1,9 @@
 import WohnungsCard from "@/components/wohnungen/wohnungs-karte"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 import * as React from "react"
 
-// Define the type for the props
-interface MainProps {
-  currentSlide: number;
-  setCurrentSlide: (slide: number) => void;
-  totalSlides: number;
-}
-
-export default function Main({ currentSlide, setCurrentSlide, totalSlides }: MainProps) {
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % totalSlides);
-  }
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
-  }
+export default function Main() {
 
   return (
     <main className="flex-grow">
