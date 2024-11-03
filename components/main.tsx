@@ -1,5 +1,6 @@
 "use client"
 import WohnungsCard from "@/components/wohnungen/wohnungs-karte"
+import WohnungsCardHorizontal from "@/components/wohnungen/wohnungs-karte-horizontal"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import Modal from "@/components/ui/modal"
@@ -77,11 +78,11 @@ export default function Main() {
             <h2 className="text-3xl font-bold tracking-tight text-black dark:text-white sm:text-4xl text-center mb-16">
               Aktuelle Wohnungsangebote
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-              {[...Array(3)].map((_, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {[...Array(4)].map((_, index) => (
                 <div key={index} className="flex justify-center">
-                  <div className="w-full" style={{ maxWidth: '350px' }}>
-                    <WohnungsCard />
+                  <div className="w-full max-w-3xl">
+                    <WohnungsCardHorizontal />
                   </div>
                 </div>
               ))}
