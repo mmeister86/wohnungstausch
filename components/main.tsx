@@ -11,6 +11,10 @@ export default function Main() {
 
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
+
+  const openModal = () => setIsModalOpen(true)
+  const closeModal = () => setIsModalOpen(false)
 
   return (
     <main className="flex-grow">
