@@ -2,9 +2,16 @@
 import WohnungsCard from "@/components/wohnungen/wohnungs-karte"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import Modal from "@/components/ui/modal"
+import WohnungstauschFormular from "@/components/wohnungen/wohnungs-formular"
 import * as React from "react"
 
 export default function Main() {
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
+
+  const openModal = () => setIsModalOpen(true)
+  const closeModal = () => setIsModalOpen(false)
+
   return (
     <main className="flex-grow">
       <section className="py-20 sm:py-32">
@@ -18,7 +25,7 @@ export default function Main() {
                 Tauschen Sie Ihre Wohnung zwischen Berlin und Schwielowsee mit Kameraden ohnen Vermittlungsgebühren.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                <Button className="h-11 px-6 text-sm font-medium">
+                <Button onClick={openModal} className="h-11 px-6 text-sm font-medium">
                   Jetzt Wohnung einstellen
                 </Button>
                 <Button variant="outline" className="h-11 px-6 text-sm font-medium">
@@ -86,6 +93,10 @@ export default function Main() {
             </div>
           </div>
         </section>
+
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
+        <WohnungstauschFormular />
+      </Modal>
     </main>
   )
 }
