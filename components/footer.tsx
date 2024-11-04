@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Kontakt</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">E-Mail: kontakt@bw-wohnungstausch.de</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">E-Mail: matthiasmeister@bundeswehr.org</p>
             <p className="text-sm text-gray-600 dark:text-gray-400">Telefon: +49 123 456789</p>
           </div>
           <div>
@@ -24,7 +24,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-12 pt-8 border-t border-gray-100 dark:border-gray-800 text-center text-sm text-gray-600 dark:text-gray-400">
-          © 2024 BW-Wohnungstausch. Alle Rechte vorbehalten.
+          © 2024 Matthias Meister.
         </div>
       </div>
     </footer>

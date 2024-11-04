@@ -24,7 +24,7 @@ export default function WohnungsCard() {
       <Card className="w-full max-w-3xl overflow-hidden bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg flex">
         <div className="relative w-2/5 aspect-[4/3]">
           <Image
-            src="https://images.unsplash.com/photo-1724497508900-a4de4b9857b1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw3fHx8ZW58MHx8fHx8"
+            src="https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Wohnungsfoto"
             fill
             sizes="(max-width: 768px) 33vw, (max-width: 1200px) 25vw, 33vw"

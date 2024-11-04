@@ -13,7 +13,7 @@ export default function Header() {
             </Link>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/angebote" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
+            <Link href="/wohnungen" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
               Angebote
             </Link>
             <Link href="/ueber-uns" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">

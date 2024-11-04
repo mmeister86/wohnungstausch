@@ -20,18 +20,20 @@ export default function Main() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="max-w-[38rem]">
               <h1 className="text-4xl font-bold tracking-tight text-black dark:text-white sm:text-5xl md:text-6xl">
-                TG-Wohnungstausch leicht gemacht
+                Trennungsgeld-Wohnungstausch leicht gemacht
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
-                Tauschen Sie Ihre Wohnung zwischen Berlin und Schwielowsee mit Kameraden ohnen Vermittlungsgebühren.
+                Tauschen Sie Ihre Wohnung bei Versetzung zwischen <br />Berlin und Schwielowsee mit Kameraden.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4">
                 <Button onClick={openModal} className="h-11 px-6 text-sm font-medium">
                   Jetzt Wohnung einstellen
                 </Button>
+                <Link href="/wohnungen">
                 <Button variant="outline" className="h-11 px-6 text-sm font-medium">
                   Angebote durchsuchen
                 </Button>
+                </Link>
               </div>
             </div>
             <div className="lg:justify-self-end">
@@ -76,15 +78,15 @@ export default function Main() {
               {[
                 {
                   title: "Erstellen Sie Ihr Wohnungsangebot",
-                  description: "Beschreiben Sie Ihre aktuelle Wohnung und Ihre Wunschwohnung detailliert."
+                  description: "Beschreiben Sie Ihre aktuelle Wohnung und fügen Sie relevante Daten hinzu."
                 },
                 {
                   title: "Finden Sie passende Tauschangebote",
-                  description: "Durchsuchen Sie die verfügbaren Angebote nach Ihren Kriterien."
+                  description: "Durchsuchen Sie  verfügbare Angebote gemäß ihrer Kriterien."
                 },
                 {
                   title: "Kontaktieren Sie potenzielle Tauschpartner",
-                  description: "Treten Sie direkt mit interessanten Tauschpartnern in Kontakt."
+                  description: "Treten Sie direkt mit relevanten Tauschpartnern in Kontakt."
                 },
                 {
                   title: "Organisieren Sie den Wohnungstausch",

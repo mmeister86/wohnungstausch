@@ -36,7 +36,7 @@ export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="absolute right-4 mt-5 top-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           aria-label="Schließen"
         >
           <X className="h-6 w-6 text-gray-500 dark:text-gray-400" />
@@ -44,7 +44,7 @@ export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
       )}
       
       <CardHeader>
-        <CardTitle className="text-3xl font-bold text-gray-800 dark:text-gray-100">Gemütliche 2-Zimmer-Wohnung in Kreuzberg</CardTitle>
+        <CardTitle className="mt-5 text-3xl font-bold text-gray-800 dark:text-gray-100">Gemütliche 2-Zimmer-Wohnung in Kreuzberg</CardTitle>
         <div className="flex items-center text-gray-600 dark:text-gray-300 mt-2">
           <MapPin className="w-5 h-5 mr-2" />
           <span>Beispielstraße 123, 10997 Berlin</span>
