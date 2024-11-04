@@ -13,11 +13,11 @@ interface WohnungsDetailProps {
 export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
   // Angenommen, dies sind die Fotos aus der Datenbank
   const photos = [
-    '/placeholder.svg?height=400&width=600&text=Foto+1',
-    '/placeholder.svg?height=400&width=600&text=Foto+2',
-    '/placeholder.svg?height=400&width=600&text=Foto+3',
-    '/placeholder.svg?height=400&width=600&text=Foto+4',
-    '/placeholder.svg?height=400&width=600&text=Foto+5',
+    'https://placehold.co/600x400?text=Hello+World',
+    'https://placehold.co/600x400?text=Hello+World1',
+    'https://placehold.co/600x400?text=Hello+World2',
+    'https://placehold.co/600x400?text=Hello+World3',
+    'https://placehold.co/600x400?text=Hello+World4',
   ]
 
   const [currentPhoto, setCurrentPhoto] = useState(0)
@@ -87,7 +87,7 @@ export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
                 alt={`Wohnungsfoto ${index + 1}`}
                 width={100}
                 height={100}
-                className={`w-24 h-24 object-cover rounded cursor-pointer ${
+                className={`w-24 h-24 object-cover rounded cursor-pointer ml-1 mt-1 ${
                   index === currentPhoto ? 'ring-2 ring-emerald-600' : ''
                 }`}
                 onClick={() => setCurrentPhoto(index)}

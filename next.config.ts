@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
 
 module.exports = {
   images: {
-    domains: ['images.unsplash.com','storyset.com'],
+    domains: ['images.unsplash.com', 'placehold.co'],
+    dangerouslyAllowSVG: true, // Erlaube das Laden von SVG-Bildern
   },
 };
 
