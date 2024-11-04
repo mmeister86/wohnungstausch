@@ -2,8 +2,8 @@
 import WohnungsCard from "./wohnungs-karte" 
 
 export default function WohnungsGrid() {
-  // Erstellen eines Arrays mit 20 Elementen (4 Spalten x 5 Reihen)
-  const wohnungen = Array(20).fill(null)
+  // Erstellen eines Arrays mit 23 Elementen (Platzhalter für die Wohnungen)
+  const wohnungen = Array(23).fill(null)
 
   return (
     <div className="container mx-auto py-8">
