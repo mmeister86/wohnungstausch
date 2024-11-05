@@ -143,10 +143,6 @@ export default function WohnungstauschFormular() {
               />
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="address" className="text-gray-700 dark:text-gray-200">Adresse der Wohnung</Label>
-              <Input id="address" placeholder="Straße, Hausnummer, PLZ, Stadt" className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100" />
-            </div>
             
             <div className="space-y-2">
               <Label htmlFor="description" className="text-gray-700 dark:text-gray-200">Beschreibung</Label>
