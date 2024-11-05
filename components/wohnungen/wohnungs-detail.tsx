@@ -5,12 +5,25 @@ import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { MapPin, Euro, Square, Building, CarFront, ChevronLeft, ChevronRight, X } from 'lucide-react'
-import { MapContainer, TileLayer, Marker } from 'react-leaflet'
+import dynamic from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
-import L from 'leaflet'
+import type { Icon } from 'leaflet'
 
-// Leaflet Marker Icon
-const markerIcon = new L.Icon({
+const MapContainer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.MapContainer),
+  { ssr: false }
+)
+const TileLayer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.TileLayer),
+  { ssr: false }
+)
+const Marker = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Marker),
+  { ssr: false }
+)
+
+// Leaflet Marker Icon - only created on client side
+const markerIcon: Icon = typeof window === 'undefined' ? null : new (require('leaflet').Icon)({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
