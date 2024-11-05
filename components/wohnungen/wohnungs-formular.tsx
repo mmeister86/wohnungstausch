@@ -9,34 +9,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, X } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import 'leaflet/dist/leaflet.css'
-import type { Icon } from 'leaflet'
-
-const MapContainer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.MapContainer),
-  { ssr: false }
-)
-const TileLayer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.TileLayer),
-  { ssr: false }
-)
-const Marker = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Marker),
-  { ssr: false }
-)
-
-// Leaflet Marker Icon - only created on client side
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const markerIcon: Icon = typeof window === 'undefined' ? null : new (require('leaflet').Icon)({
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-})
 
 export default function WohnungstauschFormular() {
   const [photos, setPhotos] = useState<File[]>([])
@@ -50,36 +22,8 @@ export default function WohnungstauschFormular() {
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [address, setAddress] = useState('')
-  const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
-  const [mapLoaded, setMapLoaded] = useState(false)
-
-  useEffect(() => {
-    setMapLoaded(true)
-  }, [])
-
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAddress(e.target.value)
-    geocodeAddress(e.target.value)
-  }
-
-  const geocodeAddress = async (address: string) => {
-    try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
-      const data = await response.json()
-      if (data.length > 0) {
-        const { lat, lon } = data[0]
-        setCoordinates([parseFloat(lat), parseFloat(lon)])
-      } else {
-        setCoordinates(null)
-      }
-    } catch (error) {
-      console.error('Fehler beim Geocoding:', error)
-      setCoordinates(null)
-    }
-  }
-
-  const handleMapClick = (e: any) => {
-    setCoordinates([e.latlng.lat, e.latlng.lng])
   }
 
   useEffect(() => {
@@ -301,21 +245,6 @@ export default function WohnungstauschFormular() {
             </div>
 
             <div className="space-y-4">
-              <Label className="text-gray-700 dark:text-gray-200 font-extrabold">Karte</Label>
-              {mapLoaded && (
-                <MapContainer 
-                  center={coordinates || [52.505, 13.361]} 
-                  zoom={13} 
-                  scrollWheelZoom={false} 
-                  className="w-full h-[300px] rounded-lg"
-                  onClick={handleMapClick}
-                >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  {coordinates && <Marker position={coordinates} icon={markerIcon} />}
-                </MapContainer>
-              )}
             </div>
 
             <Button className="w-full mt-6 bg-gradient-to-r from-green-700 to-green-800 hover:from-green-800 hover:to-green-900 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 transform hover:scale-105">
