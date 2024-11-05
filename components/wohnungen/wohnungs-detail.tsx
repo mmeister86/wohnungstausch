@@ -5,6 +5,20 @@ import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { MapPin, Euro, Square, Building, CarFront, ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
+import L from 'leaflet'
+
+// Leaflet Marker Icon
+const markerIcon = new L.Icon({
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+})
 
 interface WohnungsDetailProps {
   onClose?: () => void; // Optional, falls wir den Close-Button anzeigen wollen
@@ -175,9 +189,12 @@ export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
 
         <div className="pt-4">
           <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Lage</h3>
-          <div className="w-full h-[300px] bg-gray-200 rounded-lg flex items-center justify-center">
-            <span className="text-gray-500">Kartenansicht hier einfügen</span>
-          </div>
+          <MapContainer center={[52.505, 13.361]} zoom={13} scrollWheelZoom={false} className="w-full h-[300px] rounded-lg">
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker position={[52.505, 13.361]} icon={markerIcon} />
+          </MapContainer>
         </div>
       </CardContent>
     </Card>
