@@ -10,7 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, X } from 'lucide-react'
 
-export default function WohnungstauschFormular() {
+interface WohnungstauschFormularProps {
+  onClose?: () => void; // Optional, falls wir den Close-Button anzeigen wollen
+}
+
+export default function WohnungstauschFormular({ onClose }: WohnungstauschFormularProps) {
   const [photos, setPhotos] = useState<File[]>([])
   const [miete, setMiete] = useState({
     kaltmiete: 0,
@@ -74,7 +78,17 @@ export default function WohnungstauschFormular() {
           <X className="h-6 w-6 text-gray-500 dark:text-gray-400" />
         </button>
       )}
-    <Card className="w-full max-w-6xl mx-auto overflow-hidden bg-gradient-to-br from-white to-green-50 dark:from-gray-900 dark:to-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card className="w-full max-w-6xl mx-auto overflow-hidden bg-gradient-to-br from-white to-green-50 dark:from-gray-900 dark:to-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300 relative">
+      {/* Close Button */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute right-4 mt-5 top-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          aria-label="Schließen"
+        >
+          <X className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+        </button>
+      )}
       <CardHeader>
         <CardTitle className="text-gray-800 dark:text-gray-100">Wohnungstausch Anzeige erstellen</CardTitle>
       </CardHeader>
