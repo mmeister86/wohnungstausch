@@ -1,11 +1,10 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
+import { useState } from "react"
 
 export default function Header() {
-  function setIsMenuOpen(arg0: boolean): void {
-    throw new Error("Function not implemented.")
-  }
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
     <header className="bg-white dark:bg-black sticky top-0 z-50 w-full border-b border-gray-100 dark:border-gray-800 shadow-slate-200 shadow-sm">
