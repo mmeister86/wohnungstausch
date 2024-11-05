@@ -47,7 +47,7 @@ export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
         <CardTitle className="mt-5 text-3xl font-bold text-gray-800 dark:text-gray-100">Gemütliche 2-Zimmer-Wohnung in Kreuzberg</CardTitle>
         <div className="flex items-center text-gray-600 dark:text-gray-300 mt-2">
           <MapPin className="w-5 h-5 mr-2" />
-          <span>Beispielstraße 123, 10997 Berlin</span>
+          <span>Medebacher Weg 35, 13407 Berlin</span>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
