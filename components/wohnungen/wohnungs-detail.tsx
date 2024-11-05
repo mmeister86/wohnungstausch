@@ -23,6 +23,7 @@ const Marker = dynamic(
 )
 
 // Leaflet Marker Icon - only created on client side
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const markerIcon: Icon = typeof window === 'undefined' ? null : new (require('leaflet').Icon)({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',

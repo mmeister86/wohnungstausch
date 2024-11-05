@@ -18,9 +18,12 @@ export default function Footer() {
               <li><Link href="/nutzungsbedingungen" className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Nutzungsbedingungen</Link></li>
             </ul>
           </div>
-          <div>
+          <div id="about">
             <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Über uns</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">BW-Wohnungstausch ist eine Plattform für Bundeswehr-Angehörige in Berlin und Schwielowsee zum einfachen Tausch von Dienstwohnungen.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Diese Plattform ist ein privates Projekt anlässlich der Aufstellung OFK 
+              und hat keinen Bezug zum Dienstherrn und der zu erwartenden Umzüge i.R. von Versetzungen. 
+              Bei Fragen, Bugs oder Problemen bitte an meine eMail-Adresse schreiben oder einfach anrufen.
+            </p>
           </div>
         </div>
         <div className="mt-12 pt-8 border-t border-gray-100 dark:border-gray-800 text-center text-sm text-gray-600 dark:text-gray-400">
