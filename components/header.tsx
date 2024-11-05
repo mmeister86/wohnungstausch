@@ -28,7 +28,7 @@ export default function Header() {
             </Button>
           </nav>
           <div className="md:hidden">
-            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!setIsMenuOpen)}>
+            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               <Menu className="h-5 w-5" />
             </Button>
             {isMenuOpen && (
