@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -35,6 +35,11 @@ export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
   ]
 
   const [currentPhoto, setCurrentPhoto] = useState(0)
+  const [mapLoaded, setMapLoaded] = useState(false)
+
+  useEffect(() => {
+    setMapLoaded(true)
+  }, [])
 
   const nextPhoto = () => {
     setCurrentPhoto((prev) => (prev + 1) % photos.length)
@@ -189,12 +194,14 @@ export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
 
         <div className="pt-4">
           <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Lage</h3>
-          <MapContainer center={[52.505, 13.361]} zoom={13} scrollWheelZoom={false} className="w-full h-[300px] rounded-lg">
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Marker position={[52.505, 13.361]} icon={markerIcon} />
-          </MapContainer>
+          {mapLoaded && (
+            <MapContainer center={[52.505, 13.361]} zoom={13} scrollWheelZoom={false} className="w-full h-[300px] rounded-lg">
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Marker position={[52.505, 13.361]} icon={markerIcon} />
+            </MapContainer>
+          )}
         </div>
       </CardContent>
     </Card>
