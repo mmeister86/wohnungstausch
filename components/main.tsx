@@ -9,6 +9,27 @@ import Link from "next/link"
 
 export default function Main() {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
+  const [wohnungen, setWohnungen] = React.useState([])
+  const [isLoading, setIsLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    const fetchWohnungen = async () => {
+      try {
+        const response = await fetch('/api/wohnungen')
+        if (!response.ok) {
+          throw new Error('Fehler beim Laden der Wohnungen')
+        }
+        const data = await response.json()
+        setWohnungen(data.slice(0, 6)) // Get only the 6 most recent apartments
+      } catch (err) {
+        console.error('Error fetching apartments:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchWohnungen()
+  }, [])
 
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
@@ -114,13 +135,28 @@ export default function Main() {
               Aktuelle Wohnungsangebote
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {[...Array(4)].map((_, index) => (
-                <div key={index} className="flex justify-center">
-                  <div className="w-full max-w-3xl">
-                    <WohnungsCardHorizontal />
+              {isLoading ? (
+                // Show loading placeholders
+                [...Array(6)].map((_, index) => (
+                  <div key={index} className="flex justify-center">
+                    <div className="w-full max-w-3xl animate-pulse bg-gray-200 dark:bg-gray-800 h-40 rounded-xl"></div>
                   </div>
+                ))
+              ) : wohnungen.length > 0 ? (
+                // Show actual apartments
+                wohnungen.map((wohnung) => (
+                  <div key={wohnung.id} className="flex justify-center">
+                    <div className="w-full max-w-3xl">
+                      <WohnungsCardHorizontal wohnung={wohnung} />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                // Show message when no apartments are available
+                <div className="col-span-2 text-center py-8 text-gray-500">
+                  Aktuell sind keine Wohnungsangebote verfügbar.
                 </div>
-              ))}
+              )}
             </div>
             <div className="text-center mt-12">
               <Link href="/wohnungen">

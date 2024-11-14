@@ -9,31 +9,105 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface WohnungstauschFormularProps {
-  onClose?: () => void; // Optional, falls wir den Close-Button anzeigen wollen
+  onClose?: () => void
 }
 
-export default function WohnungstauschFormular({ }: WohnungstauschFormularProps) {
+export default function WohnungstauschFormular({ onClose }: WohnungstauschFormularProps) {
+  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [photos, setPhotos] = useState<File[]>([])
-  const [miete, setMiete] = useState({
+  const [formData, setFormData] = useState({
+    titel: '',
+    beschreibung: '',
+    strasse: '',
+    hausnummer: '',
+    plz: '',
+    stadt: '',
+    flaeche: '',
+    zimmer: '',
     kaltmiete: 0,
     nebenkosten: 0,
     stromkosten: 0,
-    heizkosten: 0
+    heizkosten: 0,
+    name: '',
+    telefon: '',
+    email: '',
+    dienstgrad: ''
   })
-  const [gesamtmiete, setGesamtmiete] = useState(0)
-  const [email, setEmail] = useState('')
-  const [emailError, setEmailError] = useState('')
-  const [address, setAddress] = useState('')
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAddress(e.target.value)
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
   }
 
-  useEffect(() => {
-    const summe = Object.values(miete).reduce((acc, curr) => acc + curr, 0)
-    setGesamtmiete(summe)
-  }, [miete])
+  const handleSelectChange = (value: string, name: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    try {
+      // Bilder in Base64 konvertieren
+      const imagePromises = photos.map(file => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onloadend = () => {
+            resolve(reader.result as string)
+          }
+          reader.onerror = reject
+          reader.readAsDataURL(file)
+        })
+      })
+
+      const base64Images = await Promise.all(imagePromises)
+
+      const response = await fetch('/api/wohnungen/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          bilder: base64Images,
+          flaeche: parseFloat(formData.flaeche),
+          zimmer: parseInt(formData.zimmer),
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Fehler beim Speichern der Wohnung')
+      }
+
+      // Erfolgreich gespeichert
+      router.refresh() // Aktualisiere die Wohnungsliste
+      if (onClose) {
+        onClose()
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      // Hier könnte man einen Fehler-State setzen und dem Benutzer anzeigen
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      strasse: e.target.value
+    }))
+  }
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -54,16 +128,23 @@ export default function WohnungstauschFormular({ }: WohnungstauschFormularProps)
 
   const handleMieteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setMiete(prev => ({ ...prev, [name]: parseFloat(value) || 0 }))
+    setFormData(prev => ({
+      ...prev,
+      [name]: parseFloat(value) || 0
+    }))
   }
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value)
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(e.target.value)) {
-      setEmailError('Bitte geben Sie eine gültige E-Mail-Adresse ein.')
+      // Hier könnte man einen Fehler-State setzen und dem Benutzer anzeigen
     } else {
-      setEmailError('')
+      // Hier könnte man den Fehler-State zurücksetzen
     }
   }
 
@@ -73,17 +154,20 @@ export default function WohnungstauschFormular({ }: WohnungstauschFormularProps)
         <CardTitle className="text-gray-800 dark:text-gray-100">Wohnungstausch Anzeige erstellen</CardTitle>
       </CardHeader>
       <CardContent>
-        <form className="space-y-6 md:space-y-0 md:grid md:grid-cols-[1fr,1fr] md:gap-6 md:divide-x md:divide-gray-200">
+        <form onSubmit={handleSubmit} className="space-y-6 md:space-y-0 md:grid md:grid-cols-[1fr,1fr] md:gap-6 md:divide-x md:divide-gray-200">
           <div className="space-y-6 pr-6">
             <div className="space-y-2">
               <Label
-                htmlFor="title"
+                htmlFor="titel"
                 className="text-gray-700 dark:text-gray-200"
               >
                 Titel der Anzeige
               </Label>
               <Input
-                id="title"
+                id="titel"
+                name="titel"
+                value={formData.titel}
+                onChange={handleInputChange}
                 placeholder="z.B. Gemütliche 2-Zimmer-Wohnung in Kreuzberg"
                 className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
               />
@@ -91,45 +175,52 @@ export default function WohnungstauschFormular({ }: WohnungstauschFormularProps)
 
             <div className="space-y-2">
               <Label
-                htmlFor="address"
-                className="text-gray-700 dark:text-gray-200"
-              >
-                Adresse der Wohnung
-              </Label>
-              <Input
-                id="address"
-                placeholder="Straße, Hausnummer, PLZ, Stadt"
-                className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
-                value={address}
-                onChange={handleAddressChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label
-                htmlFor="description"
+                htmlFor="beschreibung"
                 className="text-gray-700 dark:text-gray-200"
               >
                 Beschreibung
               </Label>
               <Textarea
-                id="description"
+                id="beschreibung"
+                name="beschreibung"
+                value={formData.beschreibung}
+                onChange={handleInputChange}
                 placeholder="Beschreiben Sie Ihre Wohnung..."
                 className="min-h-[100px] bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="strasse"
+                className="text-gray-700 dark:text-gray-200"
+              >
+                Adresse der Wohnung
+              </Label>
+              <Input
+                id="strasse"
+                name="strasse"
+                value={formData.strasse}
+                onChange={handleAddressChange}
+                placeholder="Straße, Hausnummer, PLZ, Stadt"
+                className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label
-                  htmlFor="size"
+                  htmlFor="flaeche"
                   className="text-gray-700 dark:text-gray-200"
                 >
                   Größe der Wohnung (m²)
                 </Label>
                 <Input
-                  id="size"
+                  id="flaeche"
+                  name="flaeche"
                   type="number"
+                  value={formData.flaeche}
+                  onChange={handleInputChange}
                   placeholder="z.B. 70"
                   className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                 />
@@ -137,15 +228,18 @@ export default function WohnungstauschFormular({ }: WohnungstauschFormularProps)
 
               <div className="space-y-2">
                 <Label
-                  htmlFor="floor"
+                  htmlFor="zimmer"
                   className="text-gray-700 dark:text-gray-200"
                 >
-                  Etage
+                  Anzahl Zimmer
                 </Label>
                 <Input
-                  id="floor"
+                  id="zimmer"
+                  name="zimmer"
                   type="number"
-                  placeholder="z.B. 3"
+                  value={formData.zimmer}
+                  onChange={handleInputChange}
+                  placeholder="z.B. 2"
                   className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                 />
               </div>
@@ -193,8 +287,9 @@ export default function WohnungstauschFormular({ }: WohnungstauschFormularProps)
                     id="kaltmiete"
                     name="kaltmiete"
                     type="number"
-                    placeholder="z.B. 500"
+                    value={formData.kaltmiete}
                     onChange={handleMieteChange}
+                    placeholder="z.B. 500"
                     className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   />
                 </div>
@@ -209,8 +304,9 @@ export default function WohnungstauschFormular({ }: WohnungstauschFormularProps)
                     id="nebenkosten"
                     name="nebenkosten"
                     type="number"
-                    placeholder="z.B. 150"
+                    value={formData.nebenkosten}
                     onChange={handleMieteChange}
+                    placeholder="z.B. 150"
                     className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   />
                 </div>
@@ -225,8 +321,9 @@ export default function WohnungstauschFormular({ }: WohnungstauschFormularProps)
                     id="stromkosten"
                     name="stromkosten"
                     type="number"
-                    placeholder="z.B. 50"
+                    value={formData.stromkosten}
                     onChange={handleMieteChange}
+                    placeholder="z.B. 50"
                     className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   />
                 </div>
@@ -241,20 +338,21 @@ export default function WohnungstauschFormular({ }: WohnungstauschFormularProps)
                     id="heizkosten"
                     name="heizkosten"
                     type="number"
-                    placeholder="z.B. 80"
+                    value={formData.heizkosten}
                     onChange={handleMieteChange}
+                    placeholder="z.B. 80"
                     className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   />
                 </div>
               </div>
               <div className="pt-2">
                 <Label className="text-gray-700 dark:text-gray-200 font-extrabold">
-                  Gesamtmiete: {gesamtmiete.toFixed(2)} €
+                  Gesamtmiete: {(formData.kaltmiete + formData.nebenkosten + formData.stromkosten + formData.heizkosten).toFixed(2)} €
                 </Label>
               </div>
             </div>
           </div>
-          
+
           <div className="space-y-6 pl-6">
             <div className="space-y-2">
               <Label className="text-gray-700 dark:text-gray-200">
@@ -316,11 +414,12 @@ export default function WohnungstauschFormular({ }: WohnungstauschFormularProps)
                 >
                   Dienstgrad
                 </Label>
-                <Select>
-                  <SelectTrigger
-                    id="dienstgrad"
-                    className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
-                  >
+                <Select
+                  name="dienstgrad"
+                  value={formData.dienstgrad}
+                  onValueChange={(value) => handleSelectChange(value, 'dienstgrad')}
+                >
+                  <SelectTrigger>
                     <SelectValue placeholder="Wählen Sie Ihren Dienstgrad" />
                   </SelectTrigger>
                   <SelectContent>
@@ -380,6 +479,9 @@ export default function WohnungstauschFormular({ }: WohnungstauschFormularProps)
                 </Label>
                 <Input
                   id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
                   placeholder="Vor- und Nachname"
                   className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                 />
@@ -393,6 +495,9 @@ export default function WohnungstauschFormular({ }: WohnungstauschFormularProps)
                 </Label>
                 <Input
                   id="telefon"
+                  name="telefon"
+                  value={formData.telefon}
+                  onChange={handleInputChange}
                   type="tel"
                   placeholder="z.B. 0123 45678900"
                   className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
@@ -407,24 +512,24 @@ export default function WohnungstauschFormular({ }: WohnungstauschFormularProps)
                 </Label>
                 <Input
                   id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleEmailChange}
                   type="email"
                   placeholder="ihre.email@example.com"
-                  value={email}
-                  onChange={handleEmailChange}
                   className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                 />
-                {emailError && (
-                  <p className="text-sm text-red-500 dark:text-red-400">
-                    {emailError}
-                  </p>
-                )}
               </div>
             </div>
 
             <div className="space-y-4"></div>
 
-            <Button className="w-full mt-6 bg-gradient-to-r from-green-700 to-green-800 hover:from-green-800 hover:to-green-900 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 transform hover:scale-105">
-              Anzeige erstellen
+            <Button
+              type="submit"
+              className="w-full mt-6 bg-gradient-to-r from-green-700 to-green-800 hover:from-green-800 hover:to-green-900 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 transform hover:scale-105"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Wird gespeichert...' : 'Anzeige erstellen'}
             </Button>
           </div>
         </form>

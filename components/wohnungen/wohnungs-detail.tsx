@@ -35,18 +35,28 @@ const markerIcon: Icon = typeof window === 'undefined' ? null : new (require('le
 })
 
 interface WohnungsDetailProps {
-  onClose?: () => void; // Optional, falls wir den Close-Button anzeigen wollen
+  wohnung: {
+    titel: string
+    beschreibung: string | null
+    strasse: string
+    hausnummer: string
+    plz: string
+    stadt: string
+    flaeche: number
+    zimmer: number
+    miete: number
+    bilder: string[]
+  }
+  onClose?: () => void
 }
 
-export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
-  // Angenommen, dies sind die Fotos aus der Datenbank
-  const photos = [
-    'https://placehold.co/600x400?text=Hello+World',
-    'https://placehold.co/600x400?text=Hello+World1',
-    'https://placehold.co/600x400?text=Hello+World2',
-    'https://placehold.co/600x400?text=Hello+World3',
-    'https://placehold.co/600x400?text=Hello+World4',
-  ]
+export default function WohnungsDetail({ wohnung, onClose }: WohnungsDetailProps) {
+  if (!wohnung) {
+    return null;
+  }
+
+  const { titel, beschreibung, strasse, hausnummer, plz, stadt, flaeche, zimmer, miete, bilder } = wohnung;
+  const adresse = `${strasse} ${hausnummer}, ${plz} ${stadt}`;
 
   const [currentPhoto, setCurrentPhoto] = useState(0)
   const [mapLoaded, setMapLoaded] = useState(false)
@@ -56,11 +66,11 @@ export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
   }, [])
 
   const nextPhoto = () => {
-    setCurrentPhoto((prev) => (prev + 1) % photos.length)
+    setCurrentPhoto((prev) => (prev + 1) % bilder.length)
   }
 
   const prevPhoto = () => {
-    setCurrentPhoto((prev) => (prev - 1 + photos.length) % photos.length)
+    setCurrentPhoto((prev) => (prev - 1 + bilder.length) % bilder.length)
   }
 
   return (
@@ -77,17 +87,17 @@ export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
       )}
       
       <CardHeader>
-        <CardTitle className="mt-5 text-3xl font-bold text-gray-800 dark:text-gray-100">Gemütliche 2-Zimmer-Wohnung in Kreuzberg</CardTitle>
+        <CardTitle className="mt-5 text-3xl font-bold text-gray-800 dark:text-gray-100">{titel}</CardTitle>
         <div className="flex items-center text-gray-600 dark:text-gray-300 mt-2">
           <MapPin className="w-5 h-5 mr-2" />
-          <span>Medebacher Weg 35, 13407 Berlin</span>
+          <span>{adresse}</span>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <div className="relative">
             <Image
-              src={photos[currentPhoto]}
+              src={bilder[currentPhoto]}
               alt={`Wohnungsfoto ${currentPhoto + 1}`}
               width={600}
               height={400}
@@ -113,7 +123,7 @@ export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
             </Button>
           </div>
           <div className="flex space-x-2 overflow-x-auto pb-2">
-            {photos.map((photo, index) => (
+            {bilder.map((photo, index) => (
               <Image
                 key={index}
                 src={photo}
@@ -132,74 +142,21 @@ export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <div className="flex items-center space-x-2">
             <Square className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-gray-700 dark:text-gray-200">70 m²</span>
+            <span className="text-gray-700 dark:text-gray-200">{flaeche} m²</span>
           </div>
           <div className="flex items-center space-x-2">
             <Building className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-gray-700 dark:text-gray-200">3. Etage</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <CarFront className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-gray-700 dark:text-gray-200">Stellplatz vorhanden</span>
+            <span className="text-gray-700 dark:text-gray-200">{zimmer} Zimmer</span>
           </div>
           <div className="flex items-center space-x-2">
             <Euro className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-gray-700 dark:text-gray-200">780 € Gesamtmiete</span>
+            <span className="text-gray-700 dark:text-gray-200">{miete} € Gesamtmiete</span>
           </div>
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Beschreibung</h3>
-          <p className="text-gray-700 dark:text-gray-200">
-            Diese gemütliche 2-Zimmer-Wohnung befindet sich im beliebten Berliner Stadtteil Kreuzberg. 
-            Die Wohnung bietet einen offenen Wohnbereich mit moderner Küche, ein separates Schlafzimmer 
-            und ein stilvolles Badezimmer. Die zentrale Lage ermöglicht einen schnellen Zugang zu 
-            öffentlichen Verkehrsmitteln, Einkaufsmöglichkeiten und der vielfältigen Gastronomie des Viertels.
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Mietdetails</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="font-medium text-gray-800 dark:text-gray-100">Kaltmiete</p>
-              <p className="text-gray-700 dark:text-gray-200">500 €</p>
-            </div>
-            <div>
-              <p className="font-medium text-gray-800 dark:text-gray-100">Nebenkosten</p>
-              <p className="text-gray-700 dark:text-gray-200">150 €</p>
-            </div>
-            <div>
-              <p className="font-medium text-gray-800 dark:text-gray-100">Stromkosten</p>
-              <p className="text-gray-700 dark:text-gray-200">50 €</p>
-            </div>
-            <div>
-              <p className="font-medium text-gray-800 dark:text-gray-100">Heizkosten</p>
-              <p className="text-gray-700 dark:text-gray-200">80 €</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Kontakt</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="font-medium text-gray-800 dark:text-gray-100">Name</p>
-              <p className="text-gray-700 dark:text-gray-200">Max Mustermann</p>
-            </div>
-            <div>
-              <p className="font-medium text-gray-800 dark:text-gray-100">Dienstgrad</p>
-              <p className="text-gray-700 dark:text-gray-200">Hauptfeldwebel</p>
-            </div>
-            <div>
-              <p className="font-medium text-gray-800 dark:text-gray-100">Telefon</p>
-              <p className="text-gray-700 dark:text-gray-200">0123 45678900</p>
-            </div>
-            <div>
-              <p className="font-medium text-gray-800 dark:text-gray-100">E-Mail</p>
-              <p className="text-gray-700 dark:text-gray-200">max.mustermann@bundeswehr.org</p>
-            </div>
-          </div>
+          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">Beschreibung</h3>
+          <p className="text-gray-700 dark:text-gray-200">{beschreibung}</p>
         </div>
 
         <div className="pt-4">
@@ -207,7 +164,7 @@ export default function WohnungsDetail({ onClose }: WohnungsDetailProps) {
         </div>
 
         <div className="pt-4">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Lage</h3>
+          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Lage</h3>
           {mapLoaded && (
             <MapContainer center={[52.505, 13.361]} zoom={13} scrollWheelZoom={false} className="w-full h-[300px] rounded-lg">
               <TileLayer
