@@ -13,7 +13,10 @@ export async function GET(
       include: {
         user: {
           select: {
-            id: true
+            id: true,
+            name: true,
+            email: true,
+            telefon: true
           }
         },
         location: true
