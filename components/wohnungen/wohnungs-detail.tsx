@@ -10,25 +10,13 @@ import 'leaflet/dist/leaflet.css'
 import type { Icon } from 'leaflet'
 import { geocodeAddress } from '@/lib/geocoding'
 
-const Map = dynamic(
-  () => import('@/components/map').then((mod) => mod.default),
+const PermanentLocationsMap = dynamic(
+  () => import('@/components/permanent-locations-map'),
   { ssr: false }
 )
 
-// Leaflet Marker Icon - only created on client side
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const markerIcon: Icon = typeof window === 'undefined' ? null : new (require('leaflet').Icon)({
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-})
-
 interface WohnungsDetailProps {
-  wohnung: {
+  wohnung?: {
     id: string
     titel: string
     beschreibung: string | null
@@ -47,9 +35,74 @@ interface WohnungsDetailProps {
     }
     stellplatz: boolean
   }
+  isLoading?: boolean
 }
 
-export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
+function WohnungsDetailSkeleton() {
+  return (
+    <Card className="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-lg">
+      <CardHeader>
+        <div className="h-8 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        <div className="flex items-center mt-2">
+          <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded mr-2 animate-pulse" />
+          <div className="h-5 w-1/2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-8">
+        {/* Bildergalerie Skeleton */}
+        <div className="space-y-4">
+          <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
+
+          {/* Thumbnail Carousel Skeleton */}
+          <div className="flex gap-2">
+            {[...Array(4)].map((_, index) => (
+              <div
+                key={index}
+                className="flex-shrink-0 w-24 h-24 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse"
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Details Grid Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+
+        {/* Beschreibung Skeleton */}
+        <div className="space-y-4">
+          <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="space-y-2">
+            <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+        </div>
+
+        {/* Karte Skeleton */}
+        <div className="h-[400px] rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
+
+        {/* Kontakt Skeleton */}
+        <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg">
+          <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4" />
+          <div className="space-y-2">
+            <div className="h-5 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-5 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-5 w-1/2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default function WohnungsDetail({ wohnung, isLoading }: WohnungsDetailProps) {
   const [currentPhoto, setCurrentPhoto] = useState(0)
   const [mapLoaded, setMapLoaded] = useState(false)
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
@@ -61,21 +114,32 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
   }, [])
 
   useEffect(() => {
+    if (!wohnung) return;
+
+    const { strasse, hausnummer, plz, stadt } = wohnung;
+
     async function loadCoordinates() {
-      const result = await geocodeAddress(wohnung.strasse, wohnung.hausnummer, wohnung.plz, wohnung.stadt)
-      if (result) {
-        setCoordinates([result.lat, result.lon])
+      try {
+        const result = await geocodeAddress(strasse, hausnummer, plz, stadt);
+        if (result) {
+          setCoordinates([result.lat, result.lon]);
+        }
+      } catch (error) {
+        console.error('Error loading coordinates:', error);
+        setCoordinates(null);
       }
     }
-    
-    loadCoordinates()
-  }, [wohnung.strasse, wohnung.hausnummer, wohnung.plz, wohnung.stadt])
 
-  if (!wohnung) {
-    return null;
+    loadCoordinates()
+  }, [wohnung])
+
+  if (isLoading || !wohnung) {
+    return <WohnungsDetailSkeleton />
   }
 
   const { titel, beschreibung, strasse, hausnummer, plz, stadt, flaeche, zimmer, miete, bilder, user, stellplatz } = wohnung;
+  console.log('Wohnung object:', wohnung);
+  console.log('User data:', user);
   const adresse = `${strasse} ${hausnummer}, ${plz} ${stadt}`;
 
   const nextPhoto = () => {
@@ -183,9 +247,9 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
         )}
 
         {/* Karte */}
-        {mapLoaded && coordinates && (
+        {mapLoaded && (
           <div className="h-[400px] rounded-lg overflow-hidden">
-            <Map center={coordinates} markerIcon={markerIcon} />
+            <PermanentLocationsMap currentApartmentCoordinates={coordinates} />
           </div>
         )}
 
@@ -193,23 +257,30 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
         <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg">
           <h3 className="text-xl font-semibold mb-4">Kontakt</h3>
           <div className="space-y-2">
-            <p className="flex items-center">
-              <span className="font-medium mr-2">Anbieter:</span>
-              {user.name}
-            </p>
-            <p className="flex items-center">
-              <span className="font-medium mr-2">E-Mail:</span>
-              <a href={`mailto:${user.email}`} className="text-emerald-600 hover:text-emerald-700">
-                {user.email}
-              </a>
-            </p>
-            {user.telefon && (
+            {user?.name && (
+              <p className="flex items-center">
+                <span className="font-medium mr-2">Anbieter:</span>
+                {user.name}
+              </p>
+            )}
+            {user?.email && (
+              <p className="flex items-center">
+                <span className="font-medium mr-2">E-Mail:</span>
+                <a href={`mailto:${user.email}`} className="text-emerald-600 hover:text-emerald-700">
+                  {user.email}
+                </a>
+              </p>
+            )}
+            {user?.telefon && (
               <p className="flex items-center">
                 <span className="font-medium mr-2">Telefon:</span>
                 <a href={`tel:${user.telefon}`} className="text-emerald-600 hover:text-emerald-700">
                   {user.telefon}
                 </a>
               </p>
+            )}
+            {!user?.name && !user?.email && !user?.telefon && (
+              <p className="text-gray-500 italic">Keine Kontaktinformationen verfügbar</p>
             )}
           </div>
         </div>
