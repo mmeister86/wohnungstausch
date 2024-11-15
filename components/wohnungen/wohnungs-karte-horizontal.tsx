@@ -1,7 +1,4 @@
-"use client";
-
 import * as React from "react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,7 +11,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
-import WohnungsDetail from "./wohnungs-detail";
 import { Building, Square, CarFront, Euro } from "lucide-react";
 
 interface WohnungProps {
@@ -30,12 +26,18 @@ interface WohnungProps {
     zimmer: number
     miete: number
     bilder: string[]
+    stellplatz: boolean
   }
 }
 
 export default function WohnungsCardHorizontal({ wohnung }: WohnungProps) {
-  const { id, titel, beschreibung, strasse, hausnummer, plz, stadt, flaeche, zimmer, miete, bilder } = wohnung;
+  const { id, titel, beschreibung, strasse, hausnummer, plz, stadt, flaeche, zimmer, miete, bilder, stellplatz } = wohnung;
   const adresse = `${strasse} ${hausnummer}, ${plz} ${stadt}`;
+
+  const truncateText = (text: string | null, maxLength: number) => {
+    if (!text) return '';
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  };
 
   // Frühe Rückgabe, wenn wohnung undefined ist
   if (!wohnung) {
@@ -60,11 +62,27 @@ export default function WohnungsCardHorizontal({ wohnung }: WohnungProps) {
               <Badge variant="secondary">{miete} €</Badge>
             </div>
             <CardDescription className="text-sm">{adresse}</CardDescription>
+            {beschreibung && (
+              <CardDescription className="text-sm mt-1 text-gray-600">
+                {truncateText(beschreibung, 100)}
+              </CardDescription>
+            )}
           </CardHeader>
           <CardContent className="py-2">
             <div className="flex gap-4">
-              <span className="text-sm">{flaeche}m²</span>
-              <span className="text-sm">{zimmer} Zimmer</span>
+              <span className="text-sm flex items-center gap-1">
+                <Square className="h-4 w-4" /> {flaeche}m²
+              </span>
+              <span className="text-sm flex items-center gap-1">
+                <Building className="h-4 w-4" /> {zimmer} Zimmer
+              </span>
+              <span className="text-sm flex items-center gap-1">
+                <Euro className="h-4 w-4" /> {miete}€
+              </span>
+              <span className="text-sm flex items-center gap-1">
+                <CarFront className={`h-4 w-4 ${stellplatz ? 'text-green-600' : 'text-gray-400'}`} />
+                {stellplatz ? 'inkl. Stellplatz' : 'ohne Stellplatz'}
+              </span>
             </div>
           </CardContent>
           <CardFooter className="mt-auto py-2">

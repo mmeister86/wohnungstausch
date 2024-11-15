@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { MapPin, Euro, Square, Building, CarFront, ChevronLeft, ChevronRight } from 'lucide-react'
+import { MapPin, Euro, Square, Building, ParkingSquare, ChevronLeft, ChevronRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
 import type { Icon } from 'leaflet'
@@ -137,7 +137,7 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
             <span className="text-lg">{miete} €/Monat</span>
           </div>
           <div className="flex items-center space-x-2">
-            <CarFront className={`w-5 h-5 ${stellplatz ? 'text-emerald-600' : 'text-gray-400'}`} />
+            <ParkingSquare className={`w-5 h-5 ${stellplatz ? 'text-emerald-600' : 'text-gray-400'}`} />
             <span className="text-lg">{stellplatz ? 'Stellplatz vorhanden' : 'Kein Stellplatz'}</span>
           </div>
         </div>

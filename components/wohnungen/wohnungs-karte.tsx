@@ -1,7 +1,4 @@
-"use client";
-
 import * as React from "react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,22 +11,23 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
-import WohnungsDetail from "./wohnungs-detail";
+import { Building, Square, Euro, ParkingSquare } from "lucide-react";
 
 interface WohnungProps {
   wohnung: {
-    id: string
-    titel: string
-    beschreibung: string | null
-    strasse: string
-    hausnummer: string
-    plz: string
-    stadt: string
-    flaeche: number
-    zimmer: number
-    miete: number
-    bilder: string[]
-  }
+    id: string;
+    titel: string;
+    beschreibung: string | null;
+    strasse: string;
+    hausnummer: string;
+    plz: string;
+    stadt: string;
+    flaeche: number;
+    zimmer: number;
+    miete: number;
+    bilder: string[];
+    stellplatz: boolean;
+  };
 }
 
 export default function WohnungsCard({ wohnung }: WohnungProps) {
@@ -38,8 +36,28 @@ export default function WohnungsCard({ wohnung }: WohnungProps) {
     return null;
   }
 
-  const { id, titel, beschreibung, strasse, hausnummer, plz, stadt, flaeche, zimmer, miete, bilder } = wohnung;
+  const {
+    id,
+    titel,
+    beschreibung,
+    strasse,
+    hausnummer,
+    plz,
+    stadt,
+    flaeche,
+    zimmer,
+    miete,
+    bilder,
+    stellplatz,
+  } = wohnung;
   const adresse = `${strasse} ${hausnummer}, ${plz} ${stadt}`;
+
+  const truncateText = (text: string | null, maxLength: number) => {
+    if (!text) return "";
+    return text.length > maxLength
+      ? `${text.substring(0, maxLength)}...`
+      : text;
+  };
 
   return (
     <Link href={`/wohnungen/${id}`} className="block">
@@ -58,22 +76,35 @@ export default function WohnungsCard({ wohnung }: WohnungProps) {
             <Badge variant="secondary">{miete} €</Badge>
           </div>
           <CardDescription>{adresse}</CardDescription>
+          {beschreibung && (
+            <CardDescription className="text-sm mt-1 text-gray-600">
+              {truncateText(beschreibung, 100)}
+            </CardDescription>
+          )}
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-600 line-clamp-2">{beschreibung}</p>
-          <div className="flex gap-4 mt-4">
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-medium">{flaeche}m²</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-medium">{zimmer} Zimmer</span>
-            </div>
+          <div className="flex gap-4">
+            <span className="text-sm flex items-center gap-1">
+              <Square className="h-4 w-4" /> {flaeche}m²
+            </span>
+            <span className="text-sm flex items-center gap-1">
+              <Building className="h-4 w-4" /> {zimmer} Zi
+            </span>
+            <span className="text-sm flex items-center gap-1">
+              <Euro className="h-4 w-4" /> {miete}€
+            </span>
+            <span className="text-sm flex items-center gap-1">
+              <ParkingSquare
+                className={`h-4 w-4 ${
+                  stellplatz ? "text-green-600" : "text-red-700"
+                }`}
+              />
+              {stellplatz ? "ja" : "nein"}
+            </span>
           </div>
         </CardContent>
         <CardFooter className="mt-auto">
-          <Button
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 transform"
-          >
+          <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 transform">
             Details ansehen
           </Button>
         </CardFooter>

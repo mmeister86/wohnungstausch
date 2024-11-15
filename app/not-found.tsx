@@ -11,8 +11,8 @@ export default function NotFound() {
           404 - Wohnung nicht gefunden!
         </h1>
         <p className="text-gray-600 mb-6">
-          Ups! Es sieht so aus, als hätten Sie sich in der falschen Wohnung
-          eingemietet. Keine Sorge, wir helfen Ihnen, den Weg zurück zu finden!
+          Ups! Es sieht so aus, als hätten Sie sich in der Wohnung
+          geirrt. Keine Sorge, wir helfen Ihnen, den Weg zurück zu finden!
         </p>
         <div className="space-y-4">
           <p className="text-sm text-gray-500 italic mb-6">

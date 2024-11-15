@@ -12,11 +12,11 @@ import { MapPin, Save } from "lucide-react"
 
 export default function Suche() {
   return (
-    <div className="w-full max-w-6xl mx-auto p-4">
-      <div className="flex flex-wrap gap-3 items-center">
-        <div className="w-full sm:w-auto flex-grow sm:flex-grow-0 min-w-[200px]">
+    <div className="w-full max-w-6xl mx-auto p-4 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="w-full">
           <Select>
-            <SelectTrigger className="w-full bg-white dark:bg-gray-800">
+            <SelectTrigger className="w-full bg-white dark:bg-gray-800 h-10">
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-emerald-600" />
                 <SelectValue placeholder="Dienstort" />
@@ -29,9 +29,9 @@ export default function Suche() {
           </Select>
         </div>
 
-        <div className="w-full sm:w-auto flex-grow sm:flex-grow-0 min-w-[250px] flex gap-2">
+        <div className="w-full flex gap-2">
           <Select>
-            <SelectTrigger className="w-[130px] bg-white dark:bg-gray-800">
+            <SelectTrigger className="w-[130px] bg-white dark:bg-gray-800 h-10">
               <SelectValue placeholder="Kaltmiete" />
             </SelectTrigger>
             <SelectContent>
@@ -46,9 +46,9 @@ export default function Suche() {
           />
         </div>
 
-        <div className="w-full sm:w-auto flex-grow sm:flex-grow-0 min-w-[150px]">
+        <div className="w-full">
           <Select>
-            <SelectTrigger className="w-full bg-white dark:bg-gray-800">
+            <SelectTrigger className="w-full bg-white dark:bg-gray-800 h-10">
               <SelectValue placeholder="Wohnfläche" />
             </SelectTrigger>
             <SelectContent>
@@ -61,9 +61,9 @@ export default function Suche() {
           </Select>
         </div>
 
-        <div className="w-full sm:w-auto flex-grow sm:flex-grow-0 min-w-[150px]">
+        <div className="w-full">
           <Select>
-            <SelectTrigger className="w-full bg-white dark:bg-gray-800">
+            <SelectTrigger className="w-full bg-white dark:bg-gray-800 h-10">
               <SelectValue placeholder="Zimmer" />
             </SelectTrigger>
             <SelectContent>
@@ -75,11 +75,11 @@ export default function Suche() {
           </Select>
         </div>
 
-        <Button 
-          className="w-full sm:w-auto flex-grow sm:flex-grow-0 bg-emerald-500 hover:bg-emerald-600 text-white"
+        <Button
+          className="w-full h-10 bg-emerald-500 hover:bg-emerald-600 text-white"
         >
           <Save className="h-4 w-4 mr-2" />
-          Filter speichern
+          Filtern
         </Button>
       </div>
     </div>
