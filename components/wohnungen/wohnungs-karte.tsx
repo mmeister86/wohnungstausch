@@ -1,3 +1,4 @@
+"use client"
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
-import { Building, Square, Euro, ParkingSquare } from "lucide-react";
+import { Building, Square, Euro, ParkingSquare, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
 interface WohnungProps {
   wohnung: {
@@ -31,6 +33,8 @@ interface WohnungProps {
 }
 
 export default function WohnungsCard({ wohnung }: WohnungProps) {
+  const [currentPhoto, setCurrentPhoto] = useState(0);
+
   // Frühe Rückgabe, wenn wohnung undefined ist
   if (!wohnung) {
     return null;
@@ -62,13 +66,44 @@ export default function WohnungsCard({ wohnung }: WohnungProps) {
   return (
     <Link href={`/wohnungen/${id}`} className="block">
       <Card className="flex flex-col h-full w-[350px] overflow-hidden bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300">
-        <div className="relative w-full h-48">
+        <div className="relative w-full h-48 group">
           <Image
-            src={bilder[0] || "/placeholder.jpg"}
+            src={bilder[currentPhoto] || "/placeholder.jpg"}
             alt={titel}
             fill
             className="object-cover rounded-t-lg"
           />
+          {bilder.length > 1 && (
+            <>
+              <div className="absolute inset-0 flex items-center justify-between z-10 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="bg-white/80 hover:bg-white"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPhoto((prev) => (prev - 1 + bilder.length) % bilder.length);
+                  }}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="bg-white/80 hover:bg-white"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPhoto((prev) => (prev + 1) % bilder.length);
+                  }}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-2 py-1 rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                {currentPhoto + 1} / {bilder.length}
+              </div>
+            </>
+          )}
         </div>
         <CardHeader>
           <div className="flex justify-between items-start">

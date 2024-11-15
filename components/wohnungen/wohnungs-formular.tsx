@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -12,11 +12,7 @@ import { Upload, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useToast } from "@/hooks/use-toast"
 
-interface WohnungstauschFormularProps {
-  onClose?: () => void
-}
-
-export default function WohnungstauschFormular({ onClose }: WohnungstauschFormularProps) {
+export default function WohnungstauschFormular() {
   const router = useRouter()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -37,7 +33,8 @@ export default function WohnungstauschFormular({ onClose }: WohnungstauschFormul
     name: '',
     telefon: '',
     email: '',
-    dienstgrad: ''
+    dienstgrad: '',
+    stellplatz: false
   })
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -100,9 +97,6 @@ export default function WohnungstauschFormular({ onClose }: WohnungstauschFormul
         description: "Ihre Wohnung wurde erfolgreich in unserer Datenbank gespeichert.",
       })
       router.refresh() // Aktualisiere die Wohnungsliste
-      if (onClose) {
-        onClose()
-      }
     } catch (error) {
       console.error('Error:', error)
       // Hier könnte man einen Fehler-State setzen und dem Benutzer anzeigen
@@ -112,9 +106,10 @@ export default function WohnungstauschFormular({ onClose }: WohnungstauschFormul
   }
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
-      strasse: e.target.value
+      [name]: value
     }))
   }
 
@@ -157,8 +152,15 @@ export default function WohnungstauschFormular({ onClose }: WohnungstauschFormul
     }
   }
 
+  const handleStellplatzChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      stellplatz: value === 'yes'
+    }))
+  }
+
   return (
-    <Card className="w-full max-w-6xl mx-auto overflow-hidden bg-gradient-to-br from-white to-green-50 dark:from-gray-900 dark:to-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300 relative">
+    <Card className="w-full max-w-6xl mx-auto overflow-hidden  relative">
       <CardHeader>
         <CardTitle className="text-gray-800 dark:text-gray-100">Wohnungstausch Anzeige erstellen</CardTitle>
       </CardHeader>
@@ -201,19 +203,54 @@ export default function WohnungstauschFormular({ onClose }: WohnungstauschFormul
 
             <div className="space-y-2">
               <Label
-                htmlFor="strasse"
                 className="text-gray-700 dark:text-gray-200"
               >
                 Adresse der Wohnung
               </Label>
-              <Input
-                id="strasse"
-                name="strasse"
-                value={formData.strasse}
-                onChange={handleAddressChange}
-                placeholder="Straße, Hausnummer, PLZ, Stadt"
-                className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Input
+                    id="strasse"
+                    name="strasse"
+                    value={formData.strasse}
+                    onChange={handleAddressChange}
+                    placeholder="Straße"
+                    className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    id="hausnummer"
+                    name="hausnummer"
+                    value={formData.hausnummer}
+                    onChange={handleAddressChange}
+                    placeholder="Hausnummer"
+                    className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mt-2">
+                <div className="space-y-2">
+                  <Input
+                    id="plz"
+                    name="plz"
+                    value={formData.plz}
+                    onChange={handleAddressChange}
+                    placeholder="PLZ"
+                    className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    id="stadt"
+                    name="stadt"
+                    value={formData.stadt}
+                    onChange={handleAddressChange}
+                    placeholder="Stadt"
+                    className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -258,7 +295,7 @@ export default function WohnungstauschFormular({ onClose }: WohnungstauschFormul
               <Label className="text-gray-700 dark:text-gray-200">
                 Stellplatz
               </Label>
-              <RadioGroup defaultValue="no">
+              <RadioGroup defaultValue="no" onValueChange={handleStellplatzChange}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="yes" id="stellplatz-yes" />
                   <Label

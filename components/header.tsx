@@ -18,10 +18,10 @@ export default function Header() {
           </div>
           <nav className="hidden md:flex items-center space-x-6">
             <Link href="/wohnungen" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
-              Angebote
+              Wohnungen
             </Link>
             <Link href="#about" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
-              Über uns
+              Über das Projekt
             </Link>
             <Button variant="outline" className="h-8 px-4 text-sm font-medium">
               Login
@@ -34,10 +34,10 @@ export default function Header() {
             {isMenuOpen && (
               <div className="absolute top-16 right-0 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 shadow-slate-200 shadow-sm p-4 space-y-2">
                 <Link href="/wohnungen" className="block text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
-                  Angebote
+                  Wohnungen
                 </Link>
                 <Link href="#about" className="block text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
-                  Über uns
+                  Über das Projekt
                 </Link>
                 <Button variant="outline" className="w-full h-8 px-4 text-sm font-medium">
                   Login

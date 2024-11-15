@@ -56,7 +56,7 @@ export default function WohnungDetailsPage({ params }: WohnungDetailsPageProps) 
         const response = await fetch(`/api/wohnungen/${params.id}`)
         if (!response.ok) {
           if (response.status === 404) {
-            router.push('/wohnungen/not-found')
+            router.push('/not-found')
             return
           }
           throw new Error('Fehler beim Laden der Wohnung')
@@ -101,7 +101,7 @@ export default function WohnungDetailsPage({ params }: WohnungDetailsPageProps) 
   }
 
   if (!wohnung) {
-    router.push('/wohnungen/not-found')
+    router.push('/not-found')
     return null
   }
 

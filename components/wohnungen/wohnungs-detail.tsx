@@ -8,17 +8,10 @@ import { MapPin, Euro, Square, Building, ParkingSquare, ChevronLeft, ChevronRigh
 import dynamic from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
 import type { Icon } from 'leaflet'
+import { geocodeAddress } from '@/lib/geocoding'
 
-const MapContainer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.MapContainer),
-  { ssr: false }
-)
-const TileLayer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.TileLayer),
-  { ssr: false }
-)
-const Marker = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Marker),
+const Map = dynamic(
+  () => import('@/components/map').then((mod) => mod.default),
   { ssr: false }
 )
 
@@ -50,6 +43,7 @@ interface WohnungsDetailProps {
     user: {
       name: string
       email: string
+      telefon: string
     }
     stellplatz: boolean
   }
@@ -58,10 +52,24 @@ interface WohnungsDetailProps {
 export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
   const [currentPhoto, setCurrentPhoto] = useState(0)
   const [mapLoaded, setMapLoaded] = useState(false)
+  const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
 
   useEffect(() => {
-    setMapLoaded(true)
+    if (typeof window !== 'undefined') {
+      setMapLoaded(true)
+    }
   }, [])
+
+  useEffect(() => {
+    async function loadCoordinates() {
+      const result = await geocodeAddress(wohnung.strasse, wohnung.hausnummer, wohnung.plz, wohnung.stadt)
+      if (result) {
+        setCoordinates([result.lat, result.lon])
+      }
+    }
+    
+    loadCoordinates()
+  }, [wohnung.strasse, wohnung.hausnummer, wohnung.plz, wohnung.stadt])
 
   if (!wohnung) {
     return null;
@@ -79,7 +87,7 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
   }
 
   return (
-    <Card className="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg">
+    <Card className="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-lg">
       <CardHeader>
         <CardTitle className="text-3xl font-bold text-gray-800 dark:text-gray-100">{titel}</CardTitle>
         <div className="flex items-center text-gray-600 dark:text-gray-300 mt-2">
@@ -90,35 +98,59 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
 
       <CardContent className="space-y-8">
         {/* Bildergalerie */}
-        <div className="relative aspect-video w-full overflow-hidden rounded-lg">
-          <div className="absolute inset-0 flex items-center justify-between z-10 px-4">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={prevPhoto}
-              className="bg-white/80 hover:bg-white"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={nextPhoto}
-              className="bg-white/80 hover:bg-white"
-            >
-              <ChevronRight className="h-6 w-6" />
-            </Button>
+        <div className="space-y-4">
+          <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+            <div className="absolute inset-0 flex items-center justify-between z-10 px-4">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={prevPhoto}
+                className="bg-white/80 hover:bg-white"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={nextPhoto}
+                className="bg-white/80 hover:bg-white"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </Button>
+            </div>
+            <Image
+              src={bilder[currentPhoto]}
+              alt={`Foto ${currentPhoto + 1} von ${titel}`}
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 1024px"
+              priority
+            />
           </div>
-          <Image
-            src={bilder[currentPhoto]}
-            alt={`Wohnungsfoto ${currentPhoto + 1}`}
-            fill
-            className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 1024px"
-            priority
-          />
-          <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-            {currentPhoto + 1} / {bilder.length}
+
+          {/* Thumbnail Carousel */}
+          <div className="relative">
+            <div className="overflow-x-auto pb-2">
+              <div className="flex gap-2">
+                {bilder.map((bild, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentPhoto(index)}
+                    className={`flex-shrink-0 relative w-24 h-24 rounded-lg overflow-hidden transition-all hover:opacity-100 ${
+                      currentPhoto === index ? '' : 'opacity-70'
+                    }`}
+                  >
+                    <Image
+                      src={bild}
+                      alt={`Vorschau ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="96px"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -151,19 +183,9 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
         )}
 
         {/* Karte */}
-        {mapLoaded && (
+        {mapLoaded && coordinates && (
           <div className="h-[400px] rounded-lg overflow-hidden">
-            <MapContainer
-              center={[51.1657, 10.4515]}
-              zoom={13}
-              className="h-full w-full"
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <Marker position={[51.1657, 10.4515]} icon={markerIcon} />
-            </MapContainer>
+            <Map center={coordinates} markerIcon={markerIcon} />
           </div>
         )}
 
@@ -181,6 +203,14 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
                 {user.email}
               </a>
             </p>
+            {user.telefon && (
+              <p className="flex items-center">
+                <span className="font-medium mr-2">Telefon:</span>
+                <a href={`tel:${user.telefon}`} className="text-emerald-600 hover:text-emerald-700">
+                  {user.telefon}
+                </a>
+              </p>
+            )}
           </div>
         </div>
       </CardContent>
