@@ -3,8 +3,14 @@ interface GeocodingResult {
   lon: number;
 }
 
+// Add a delay to prevent rate limiting
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export async function geocodeAddress(strasse: string, hausnummer: string, plz: string, stadt: string): Promise<GeocodingResult | null> {
   try {
+    // Add a 1-second delay to prevent rate limiting
+    await delay(1000);
+    
     const query = encodeURIComponent(`${strasse} ${hausnummer}, ${plz} ${stadt}, Germany`);
     const response = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`,
@@ -14,6 +20,10 @@ export async function geocodeAddress(strasse: string, hausnummer: string, plz: s
         }
       }
     );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
     const data = await response.json();
     
@@ -27,6 +37,6 @@ export async function geocodeAddress(strasse: string, hausnummer: string, plz: s
     return null;
   } catch (error) {
     console.error('Geocoding error:', error);
-    return null;
+    throw error;
   }
 }

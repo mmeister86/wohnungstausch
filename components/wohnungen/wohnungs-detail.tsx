@@ -27,14 +27,12 @@ interface WohnungsDetailProps {
     zimmer: number
     miete: number
     bilder: string[]
+    stellplatz: boolean
     user: {
       name: string
       email: string
-      telefon: string
     }
-    stellplatz: boolean
   }
-  isLoading?: boolean
 }
 
 function WohnungsDetailSkeleton() {
@@ -101,10 +99,11 @@ function WohnungsDetailSkeleton() {
   )
 }
 
-export default function WohnungsDetail({ wohnung, isLoading }: WohnungsDetailProps) {
+export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
   const [currentPhoto, setCurrentPhoto] = useState(0)
   const [mapLoaded, setMapLoaded] = useState(false)
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
+  const [geocodingError, setGeocodingError] = useState<string | null>(null)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -119,12 +118,16 @@ export default function WohnungsDetail({ wohnung, isLoading }: WohnungsDetailPro
 
     async function loadCoordinates() {
       try {
+        setGeocodingError(null);
         const result = await geocodeAddress(strasse, hausnummer, plz, stadt);
         if (result) {
           setCoordinates([result.lat, result.lon]);
+        } else {
+          setGeocodingError('Konnte die Adresse nicht finden');
         }
       } catch (error) {
         console.error('Error loading coordinates:', error);
+        setGeocodingError('Fehler beim Laden der Koordinaten');
         setCoordinates(null);
       }
     }
@@ -132,7 +135,7 @@ export default function WohnungsDetail({ wohnung, isLoading }: WohnungsDetailPro
     loadCoordinates()
   }, [wohnung])
 
-  if (isLoading || !wohnung) {
+  if (!wohnung) {
     return <WohnungsDetailSkeleton />
   }
 
@@ -246,11 +249,22 @@ export default function WohnungsDetail({ wohnung, isLoading }: WohnungsDetailPro
         )}
 
         {/* Karte */}
-        {mapLoaded && (
-          <div className="h-[400px] rounded-lg overflow-hidden">
-            <PermanentLocationsMap currentApartmentCoordinates={coordinates ?? undefined} />
-          </div>
-        )}
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-2">Standort</h3>
+          {mapLoaded && (
+            <div className="h-[400px] rounded-lg overflow-hidden">
+              {geocodingError ? (
+                <div className="flex items-center justify-center h-full bg-gray-100 text-gray-500">
+                  {geocodingError}
+                </div>
+              ) : (
+                <PermanentLocationsMap 
+                  currentApartmentCoordinates={coordinates ?? undefined}
+                />
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Kontakt */}
         <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg">
@@ -270,15 +284,7 @@ export default function WohnungsDetail({ wohnung, isLoading }: WohnungsDetailPro
                 </a>
               </p>
             )}
-            {user?.telefon && (
-              <p className="flex items-center">
-                <span className="font-medium mr-2">Telefon:</span>
-                <a href={`tel:${user.telefon}`} className="text-emerald-600 hover:text-emerald-700">
-                  {user.telefon}
-                </a>
-              </p>
-            )}
-            {!user?.name && !user?.email && !user?.telefon && (
+            {!user?.name && !user?.email && (
               <p className="text-gray-500 italic">Keine Kontaktinformationen verfügbar</p>
             )}
           </div>
