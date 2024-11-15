@@ -13,12 +13,13 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import Modal from "@/components/ui/modal";
+import Link from "next/link";
 import WohnungsDetail from "./wohnungs-detail";
 import { Building, Square, CarFront, Euro } from "lucide-react";
 
 interface WohnungProps {
   wohnung: {
+    id: string
     titel: string
     beschreibung: string | null
     strasse: string
@@ -33,20 +34,17 @@ interface WohnungProps {
 }
 
 export default function WohnungsCardHorizontal({ wohnung }: WohnungProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { id, titel, beschreibung, strasse, hausnummer, plz, stadt, flaeche, zimmer, miete, bilder } = wohnung;
+  const adresse = `${strasse} ${hausnummer}, ${plz} ${stadt}`;
 
   // Frühe Rückgabe, wenn wohnung undefined ist
   if (!wohnung) {
     return null;
   }
 
-  const { titel, beschreibung, strasse, hausnummer, plz, stadt, flaeche, zimmer, miete, bilder } = wohnung;
-  const adresse = `${strasse} ${hausnummer}, ${plz} ${stadt}`;
-
   return (
-    <>
-      {/* Hauptkarte */}
-      <Card className="flex flex-row h-40 overflow-hidden">
+    <Link href={`/wohnungen/${id}`} className="block">
+      <Card className="flex flex-row hover:shadow-lg transition-shadow duration-300">
         <div className="relative w-1/3">
           <Image
             src={bilder[0] || "/placeholder.jpg"}
@@ -72,20 +70,12 @@ export default function WohnungsCardHorizontal({ wohnung }: WohnungProps) {
           <CardFooter className="mt-auto py-2">
             <Button
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 shadow-md hover:shadow-lg"
-              onClick={() => setIsModalOpen(true)}
             >
               Details
             </Button>
           </CardFooter>
         </div>
       </Card>
-
-      {/* Modal mit Wohnungsdetails */}
-      {isModalOpen && (
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          <WohnungsDetail wohnung={wohnung} onClose={() => setIsModalOpen(false)} />
-        </Modal>
-      )}
-    </>
+    </Link>
   );
 }

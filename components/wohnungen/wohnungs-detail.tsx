@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { MapPin, Euro, Square, Building, CarFront, ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { MapPin, Euro, Square, Building, CarFront, ChevronLeft, ChevronRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
 import type { Icon } from 'leaflet'
@@ -36,6 +36,7 @@ const markerIcon: Icon = typeof window === 'undefined' ? null : new (require('le
 
 interface WohnungsDetailProps {
   wohnung: {
+    id: string
     titel: string
     beschreibung: string | null
     strasse: string
@@ -46,24 +47,28 @@ interface WohnungsDetailProps {
     zimmer: number
     miete: number
     bilder: string[]
+    user: {
+      name: string
+      email: string
+    }
+    stellplatz: boolean
   }
-  onClose?: () => void
 }
 
-export default function WohnungsDetail({ wohnung, onClose }: WohnungsDetailProps) {
-  if (!wohnung) {
-    return null;
-  }
-
-  const { titel, beschreibung, strasse, hausnummer, plz, stadt, flaeche, zimmer, miete, bilder } = wohnung;
-  const adresse = `${strasse} ${hausnummer}, ${plz} ${stadt}`;
-
+export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
   const [currentPhoto, setCurrentPhoto] = useState(0)
   const [mapLoaded, setMapLoaded] = useState(false)
 
   useEffect(() => {
     setMapLoaded(true)
   }, [])
+
+  if (!wohnung) {
+    return null;
+  }
+
+  const { titel, beschreibung, strasse, hausnummer, plz, stadt, flaeche, zimmer, miete, bilder, user, stellplatz } = wohnung;
+  const adresse = `${strasse} ${hausnummer}, ${plz} ${stadt}`;
 
   const nextPhoto = () => {
     setCurrentPhoto((prev) => (prev + 1) % bilder.length)
@@ -74,107 +79,111 @@ export default function WohnungsDetail({ wohnung, onClose }: WohnungsDetailProps
   }
 
   return (
-    <Card className="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg relative">
-      {/* Close Button */}
-      {onClose && (
-        <button
-          onClick={onClose}
-          className="absolute right-4 mt-5 top-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          aria-label="Schließen"
-        >
-          <X className="h-6 w-6 text-gray-500 dark:text-gray-400" />
-        </button>
-      )}
-      
+    <Card className="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg">
       <CardHeader>
-        <CardTitle className="mt-5 text-3xl font-bold text-gray-800 dark:text-gray-100">{titel}</CardTitle>
+        <CardTitle className="text-3xl font-bold text-gray-800 dark:text-gray-100">{titel}</CardTitle>
         <div className="flex items-center text-gray-600 dark:text-gray-300 mt-2">
           <MapPin className="w-5 h-5 mr-2" />
           <span>{adresse}</span>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <div className="relative">
-            <Image
-              src={bilder[currentPhoto]}
-              alt={`Wohnungsfoto ${currentPhoto + 1}`}
-              width={600}
-              height={400}
-              className="w-full h-[400px] object-cover rounded-lg"
-            />
+
+      <CardContent className="space-y-8">
+        {/* Bildergalerie */}
+        <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+          <div className="absolute inset-0 flex items-center justify-between z-10 px-4">
             <Button
               variant="outline"
               size="icon"
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white"
               onClick={prevPhoto}
-              aria-label="Vorheriges Foto"
+              className="bg-white/80 hover:bg-white"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-6 w-6" />
             </Button>
             <Button
               variant="outline"
               size="icon"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white"
               onClick={nextPhoto}
-              aria-label="Nächstes Foto"
+              className="bg-white/80 hover:bg-white"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-6 w-6" />
             </Button>
           </div>
-          <div className="flex space-x-2 overflow-x-auto pb-2">
-            {bilder.map((photo, index) => (
-              <Image
-                key={index}
-                src={photo}
-                alt={`Wohnungsfoto ${index + 1}`}
-                width={100}
-                height={100}
-                className={`w-24 h-24 object-cover rounded cursor-pointer ml-1 mt-1 ${
-                  index === currentPhoto ? 'ring-2 ring-emerald-600' : ''
-                }`}
-                onClick={() => setCurrentPhoto(index)}
-              />
-            ))}
+          <Image
+            src={bilder[currentPhoto]}
+            alt={`Wohnungsfoto ${currentPhoto + 1}`}
+            fill
+            className="object-cover"
+            sizes="(max-width: 1024px) 100vw, 1024px"
+            priority
+          />
+          <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+            {currentPhoto + 1} / {bilder.length}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        {/* Details Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="flex items-center space-x-2">
-            <Square className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-gray-700 dark:text-gray-200">{flaeche} m²</span>
+            <Square className="w-5 h-5 text-emerald-600" />
+            <span className="text-lg">{flaeche} m²</span>
           </div>
           <div className="flex items-center space-x-2">
-            <Building className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-gray-700 dark:text-gray-200">{zimmer} Zimmer</span>
+            <Building className="w-5 h-5 text-emerald-600" />
+            <span className="text-lg">{zimmer} Zimmer</span>
           </div>
           <div className="flex items-center space-x-2">
-            <Euro className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-gray-700 dark:text-gray-200">{miete} € Gesamtmiete</span>
+            <Euro className="w-5 h-5 text-emerald-600" />
+            <span className="text-lg">{miete} €/Monat</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <CarFront className={`w-5 h-5 ${stellplatz ? 'text-emerald-600' : 'text-gray-400'}`} />
+            <span className="text-lg">{stellplatz ? 'Stellplatz vorhanden' : 'Kein Stellplatz'}</span>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">Beschreibung</h3>
-          <p className="text-gray-700 dark:text-gray-200">{beschreibung}</p>
-        </div>
+        {/* Beschreibung */}
+        {beschreibung && (
+          <div className="prose dark:prose-invert max-w-none">
+            <h3 className="text-xl font-semibold mb-4">Beschreibung</h3>
+            <p className="whitespace-pre-wrap">{beschreibung}</p>
+          </div>
+        )}
 
-        <div className="pt-4">
-          <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 shadow-md hover:shadow-lg">Kontakt aufnehmen</Button>
-        </div>
-
-        <div className="pt-4">
-          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Lage</h3>
-          {mapLoaded && (
-            <MapContainer center={[52.505, 13.361]} zoom={13} scrollWheelZoom={false} className="w-full h-[300px] rounded-lg">
+        {/* Karte */}
+        {mapLoaded && (
+          <div className="h-[400px] rounded-lg overflow-hidden">
+            <MapContainer
+              center={[51.1657, 10.4515]}
+              zoom={13}
+              className="h-full w-full"
+            >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               />
-              <Marker position={[52.505, 13.361]} icon={markerIcon} />
+              <Marker position={[51.1657, 10.4515]} icon={markerIcon} />
             </MapContainer>
-          )}
+          </div>
+        )}
+
+        {/* Kontakt */}
+        <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg">
+          <h3 className="text-xl font-semibold mb-4">Kontakt</h3>
+          <div className="space-y-2">
+            <p className="flex items-center">
+              <span className="font-medium mr-2">Anbieter:</span>
+              {user.name}
+            </p>
+            <p className="flex items-center">
+              <span className="font-medium mr-2">E-Mail:</span>
+              <a href={`mailto:${user.email}`} className="text-emerald-600 hover:text-emerald-700">
+                {user.email}
+              </a>
+            </p>
+          </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

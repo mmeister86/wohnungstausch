@@ -13,11 +13,12 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import Modal from "@/components/ui/modal";
+import Link from "next/link";
 import WohnungsDetail from "./wohnungs-detail";
 
 interface WohnungProps {
   wohnung: {
+    id: string
     titel: string
     beschreibung: string | null
     strasse: string
@@ -32,18 +33,16 @@ interface WohnungProps {
 }
 
 export default function WohnungsCard({ wohnung }: WohnungProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   // Frühe Rückgabe, wenn wohnung undefined ist
   if (!wohnung) {
     return null;
   }
 
-  const { titel, beschreibung, strasse, hausnummer, plz, stadt, flaeche, zimmer, miete, bilder } = wohnung;
+  const { id, titel, beschreibung, strasse, hausnummer, plz, stadt, flaeche, zimmer, miete, bilder } = wohnung;
   const adresse = `${strasse} ${hausnummer}, ${plz} ${stadt}`;
 
   return (
-    <>
+    <Link href={`/wohnungen/${id}`} className="block">
       <Card className="flex flex-col h-full w-[350px] overflow-hidden bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <div className="relative w-full h-48">
           <Image
@@ -74,17 +73,11 @@ export default function WohnungsCard({ wohnung }: WohnungProps) {
         <CardFooter className="mt-auto">
           <Button
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 transform"
-            onClick={() => setIsModalOpen(true)}
           >
             Details ansehen
           </Button>
         </CardFooter>
       </Card>
-      {isModalOpen && (
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          <WohnungsDetail onClose={() => setIsModalOpen(false)} />
-        </Modal>
-      )}
-    </>
+    </Link>
   );
 }

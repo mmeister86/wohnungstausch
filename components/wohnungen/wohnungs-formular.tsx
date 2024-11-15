@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useToast } from "@/hooks/use-toast"
 
 interface WohnungstauschFormularProps {
   onClose?: () => void
@@ -17,6 +18,7 @@ interface WohnungstauschFormularProps {
 
 export default function WohnungstauschFormular({ onClose }: WohnungstauschFormularProps) {
   const router = useRouter()
+  const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [photos, setPhotos] = useState<File[]>([])
   const [formData, setFormData] = useState({
@@ -86,10 +88,17 @@ export default function WohnungstauschFormular({ onClose }: WohnungstauschFormul
       })
 
       if (!response.ok) {
-        throw new Error('Fehler beim Speichern der Wohnung')
+        const errorData = await response.json();
+        console.error('Error response:', errorData);
+        throw new Error(`Fehler beim Speichern der Wohnung: ${JSON.stringify(errorData)}`);
       }
 
       // Erfolgreich gespeichert
+      toast({
+        variant: "success",
+        title: "Wohnung erfolgreich erstellt",
+        description: "Ihre Wohnung wurde erfolgreich in unserer Datenbank gespeichert.",
+      })
       router.refresh() // Aktualisiere die Wohnungsliste
       if (onClose) {
         onClose()

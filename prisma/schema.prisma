@@ -29,6 +29,7 @@ model Wohnung {
   flaeche     Float
   zimmer      Int
   miete       Float
+  stellplatz  Boolean  @default(false)
   userId      String
   bilder      String[]
   user        User     @relation(fields: [userId], references: [id])
