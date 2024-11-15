@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { MapPin, Euro, Square, Building, ParkingSquare, ChevronLeft, ChevronRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
-import type { Icon } from 'leaflet'
 import { geocodeAddress } from '@/lib/geocoding'
 
 const PermanentLocationsMap = dynamic(
@@ -160,7 +159,7 @@ export default function WohnungsDetail({ wohnung, isLoading }: WohnungsDetailPro
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-8">
+      <CardContent className="space-y-8 relative z-10">
         {/* Bildergalerie */}
         <div className="space-y-4">
           <div className="relative aspect-video w-full overflow-hidden rounded-lg">
@@ -249,7 +248,7 @@ export default function WohnungsDetail({ wohnung, isLoading }: WohnungsDetailPro
         {/* Karte */}
         {mapLoaded && (
           <div className="h-[400px] rounded-lg overflow-hidden">
-            <PermanentLocationsMap currentApartmentCoordinates={coordinates} />
+            <PermanentLocationsMap currentApartmentCoordinates={coordinates ?? undefined} />
           </div>
         )}
 
