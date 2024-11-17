@@ -7,30 +7,36 @@ import { WohnungResponse } from "@/types"
 
 function WohnungsCardHorizontalSkeleton() {
   return (
-    <div className="w-full p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
-      <div className="flex flex-col md:flex-row gap-4">
-        {/* Bild Skeleton */}
-        <div className="relative w-full md:w-48 h-48 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
-        
-        <div className="flex-1 space-y-4">
+    <div className="flex flex-row hover:shadow-lg transition-shadow duration-300 overflow-hidden bg-white dark:bg-gray-800 rounded-lg">
+      {/* Bild Skeleton */}
+      <div className="relative w-1/3 min-h-[200px] bg-gray-200 dark:bg-gray-700 rounded-l-lg animate-pulse flex items-center justify-center">
+      </div>
+
+      <div className="w-2/3 flex flex-col p-3">
+        <div className="py-2 px-0">
           {/* Titel Skeleton */}
-          <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-          
-          {/* Details Grid Skeleton */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+          {/* Adresse Skeleton */}
+          <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+          {/* Beschreibung Skeleton */}
+          <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+
+        {/* Details Skeleton */}
+        <div className="py-2 px-0">
+          <div className="flex gap-4">
             {[...Array(4)].map((_, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              <div key={index} className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                <div className="h-4 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
               </div>
             ))}
           </div>
-          
-          {/* Beschreibung Skeleton */}
-          <div className="space-y-2">
-            <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-            <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-          </div>
+        </div>
+
+        {/* Button Skeleton */}
+        <div className="mt-auto py-2 px-0">
+          <div className="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
         </div>
       </div>
     </div>

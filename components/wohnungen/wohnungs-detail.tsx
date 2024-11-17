@@ -1,43 +1,52 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { MapPin, Euro, Square, ParkingSquare, ChevronLeft, ChevronRight, Bed } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import 'leaflet/dist/leaflet.css'
-import { geocodeAddress } from '@/lib/geocoding'
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  MapPin,
+  Euro,
+  Home,
+  ParkingSquare,
+  ChevronLeft,
+  ChevronRight,
+  Bed,
+} from "lucide-react";
+import dynamic from "next/dynamic";
+import "leaflet/dist/leaflet.css";
+import { geocodeAddress } from "@/lib/geocoding";
 
 const PermanentLocationsMap = dynamic(
-  () => import('@/components/permanent-locations-map'),
+  () => import("@/components/permanent-locations-map"),
   { ssr: false }
-)
+);
 
 interface WohnungsDetailProps {
   wohnung?: {
-    id: string
-    titel: string
-    beschreibung: string | null
-    strasse: string
-    hausnummer: string
-    plz: string
-    stadt: string
-    flaeche: number
-    zimmer: number
-    miete: number
-    bilder: string[]
-    stellplatz: boolean
+    id: string;
+    titel: string;
+    beschreibung: string | null;
+    strasse: string;
+    hausnummer: string;
+    plz: string;
+    stadt: string;
+    flaeche: number;
+    zimmer: number;
+    miete: number;
+    bilder: string[];
+    stellplatz: boolean;
     user: {
-      name: string
-      email: string
-    }
-  }
+      name: string;
+      email: string;
+      telefon: string;
+    };
+  };
 }
 
 export function WohnungsDetailSkeleton() {
   return (
-    <Card className="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-lg">
+    <Card className="w-full bg-white dark:bg-gray-800 rounded-lg">
       <CardHeader>
         <div className="h-8 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
         <div className="flex items-center mt-2">
@@ -84,32 +93,22 @@ export function WohnungsDetailSkeleton() {
 
         {/* Karte Skeleton */}
         <div className="h-[400px] rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
-
-        {/* Kontakt Skeleton */}
-        <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg">
-          <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4" />
-          <div className="space-y-2">
-            <div className="h-5 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-            <div className="h-5 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-            <div className="h-5 w-1/2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-          </div>
-        </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
-  const [currentPhoto, setCurrentPhoto] = useState(0)
-  const [mapLoaded, setMapLoaded] = useState(false)
-  const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
-  const [geocodingError, setGeocodingError] = useState<string | null>(null)
+  const [currentPhoto, setCurrentPhoto] = useState(0);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
+  const [geocodingError, setGeocodingError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setMapLoaded(true)
+    if (typeof window !== "undefined") {
+      setMapLoaded(true);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (!wohnung) return;
@@ -123,39 +122,54 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
         if (result) {
           setCoordinates([result.lat, result.lon]);
         } else {
-          setGeocodingError('Konnte die Adresse nicht finden');
+          setGeocodingError("Konnte die Adresse nicht finden");
         }
       } catch (error) {
-        console.error('Error loading coordinates:', error);
-        setGeocodingError('Fehler beim Laden der Koordinaten');
+        console.error("Error loading coordinates:", error);
+        setGeocodingError("Fehler beim Laden der Koordinaten");
         setCoordinates(null);
       }
     }
 
-    loadCoordinates()
-  }, [wohnung])
+    loadCoordinates();
+  }, [wohnung]);
 
   if (!wohnung) {
-    return <WohnungsDetailSkeleton />
+    return <WohnungsDetailSkeleton />;
   }
 
-  const { titel, beschreibung, strasse, hausnummer, plz, stadt, flaeche, zimmer, miete, bilder, user, stellplatz } = wohnung;
-  console.log('Wohnung object:', wohnung);
-  console.log('User data:', user);
+  const {
+    titel,
+    beschreibung,
+    strasse,
+    hausnummer,
+    plz,
+    stadt,
+    flaeche,
+    zimmer,
+    miete,
+    bilder,
+    user,
+    stellplatz,
+  } = wohnung;
+  console.log("Wohnung object:", wohnung);
+  console.log("User data:", user);
   const adresse = `${strasse} ${hausnummer}, ${plz} ${stadt}`;
 
   const nextPhoto = () => {
-    setCurrentPhoto((prev) => (prev + 1) % bilder.length)
-  }
+    setCurrentPhoto((prev) => (prev + 1) % bilder.length);
+  };
 
   const prevPhoto = () => {
-    setCurrentPhoto((prev) => (prev - 1 + bilder.length) % bilder.length)
-  }
+    setCurrentPhoto((prev) => (prev - 1 + bilder.length) % bilder.length);
+  };
 
   return (
-    <Card className="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-lg">
+    <Card className="w-full bg-white dark:bg-gray-800 rounded-lg">
       <CardHeader>
-        <CardTitle className="text-3xl font-bold text-gray-800 dark:text-gray-100">{titel}</CardTitle>
+        <CardTitle className="text-3xl font-bold text-gray-800 dark:text-gray-100">
+          {titel}
+        </CardTitle>
         <div className="flex items-center text-gray-600 dark:text-gray-300 mt-2">
           <MapPin className="w-5 h-5 mr-2" />
           <span>{adresse}</span>
@@ -166,32 +180,53 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
         {/* Bildergalerie */}
         <div className="space-y-4">
           <div className="relative aspect-video w-full overflow-hidden rounded-lg">
-            <div className="absolute inset-0 flex items-center justify-between z-10 px-4">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={prevPhoto}
-                className="bg-white/80 hover:bg-white"
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={nextPhoto}
-                className="bg-white/80 hover:bg-white"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </Button>
-            </div>
-            <Image
-              src={bilder[currentPhoto]}
-              alt={`Foto ${currentPhoto + 1} von ${titel}`}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 1024px"
-              priority
-            />
+            {bilder.length > 0 ? (
+              <>
+                <div className="absolute inset-0 flex items-center justify-between z-10 px-4">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={prevPhoto}
+                    className="bg-white/80 hover:bg-white"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={nextPhoto}
+                    className="bg-white/80 hover:bg-white"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </Button>
+                </div>
+                <Image
+                  src={bilder[currentPhoto]}
+                  alt={`Foto ${currentPhoto + 1} von ${titel}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 1024px"
+                  priority
+                  onError={(e) => {
+                    // Wenn das Bild nicht geladen werden kann, zeige den Platzhalter
+                    const target = e.target as HTMLElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent && !parent.querySelector('.placeholder-icon')) {
+                      parent.classList.add('bg-gray-200', 'dark:bg-gray-700', 'flex', 'items-center', 'justify-center');
+                      const placeholder = document.createElement('div');
+                      placeholder.className = 'placeholder-icon';
+                      placeholder.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 dark:text-gray-500"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`;
+                      parent.appendChild(placeholder);
+                    }
+                  }}
+                />
+              </>
+            ) : (
+              <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <Home className="w-24 h-24 text-gray-400 dark:text-gray-500" />
+              </div>
+            )}
           </div>
 
           {/* Thumbnail Carousel */}
@@ -203,7 +238,7 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
                     key={index}
                     onClick={() => setCurrentPhoto(index)}
                     className={`flex-shrink-0 relative w-24 h-24 rounded-lg overflow-hidden transition-all hover:opacity-100 ${
-                      currentPhoto === index ? '' : 'opacity-70'
+                      currentPhoto === index ? "" : "opacity-70"
                     }`}
                   >
                     <Image
@@ -212,6 +247,19 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
                       fill
                       className="object-cover"
                       sizes="96px"
+                      onError={(e) => {
+                        // Wenn das Thumbnail nicht geladen werden kann, zeige den Platzhalter
+                        const target = e.target as HTMLElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent && !parent.querySelector('.placeholder-icon')) {
+                          parent.classList.add('bg-gray-200', 'dark:bg-gray-700', 'flex', 'items-center', 'justify-center');
+                          const placeholder = document.createElement('div');
+                          placeholder.className = 'placeholder-icon';
+                          placeholder.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 dark:text-gray-500"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`;
+                          parent.appendChild(placeholder);
+                        }
+                      }}
                     />
                   </button>
                 ))}
@@ -223,7 +271,7 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
         {/* Details Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="flex items-center space-x-2">
-            <Square className="w-5 h-5 text-emerald-600" />
+            <Home className="w-5 h-5 text-emerald-600" />
             <span className="text-lg">{flaeche} m²</span>
           </div>
           <div className="flex items-center space-x-2">
@@ -235,8 +283,14 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
             <span className="text-lg">{miete} €/Monat</span>
           </div>
           <div className="flex items-center space-x-2">
-            <ParkingSquare className={`w-5 h-5 ${stellplatz ? 'text-emerald-600' : 'text-gray-400'}`} />
-            <span className="text-lg">{stellplatz ? 'Stellplatz vorhanden' : 'Kein Stellplatz'}</span>
+            <ParkingSquare
+              className={`w-5 h-5 ${
+                stellplatz ? "text-emerald-600" : "text-gray-400"
+              }`}
+            />
+            <span className="text-lg">
+              {stellplatz ? "Stellplatz vorhanden" : "Kein Stellplatz"}
+            </span>
           </div>
         </div>
 
@@ -271,30 +325,6 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
               )}
             </div>
           ) : null}
-        </div>
-
-        {/* Kontakt */}
-        <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg">
-          <h3 className="text-xl font-semibold mb-4">Kontakt</h3>
-          <div className="space-y-2">
-            {user?.name && (
-              <p className="flex items-center">
-                <span className="font-medium mr-2">Anbieter:</span>
-                {user.name}
-              </p>
-            )}
-            {user?.email && (
-              <p className="flex items-center">
-                <span className="font-medium mr-2">E-Mail:</span>
-                <a href={`mailto:${user.email}`} className="text-emerald-600 hover:text-emerald-700">
-                  {user.email}
-                </a>
-              </p>
-            )}
-            {!user?.name && !user?.email && (
-              <p className="text-gray-500 italic">Keine Kontaktinformationen verfügbar</p>
-            )}
-          </div>
         </div>
       </CardContent>
     </Card>

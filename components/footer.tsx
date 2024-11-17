@@ -8,7 +8,8 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Kontakt</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">E-Mail: matthiasmeister@bundeswehr.org</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Telefon: +49 123 456789</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Telefon (BWI): 90 8203 4437</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Telefon: +030 4981 4437</p>
           </div>
           <div>
             <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Links</h3>

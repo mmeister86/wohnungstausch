@@ -24,12 +24,13 @@ type WohnungProps = {
       telefon: string
     }
   }
+  className?: string
 }
 
-export function WohnungsCard({ wohnung }: WohnungProps) {
+export function WohnungsCard({ wohnung, className }: WohnungProps) {
   return (
     <Link href={`/wohnungen/${wohnung.id}`}>
-      <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+      <div className={`w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden ${className || ''}`}>
         {wohnung.bilder && wohnung.bilder.length > 0 ? (
           <div className="w-full h-48 relative">
             <Image
@@ -39,6 +40,19 @@ export function WohnungsCard({ wohnung }: WohnungProps) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover hover:scale-110 transition-transform duration-700 ease-in-out"
               priority={false}
+              onError={(e) => {
+                // Wenn das Bild nicht geladen werden kann, zeige den Platzhalter
+                const target = e.target as HTMLElement;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent && !parent.querySelector('.placeholder-icon')) {
+                  parent.classList.add('bg-gray-200', 'dark:bg-gray-700', 'flex', 'items-center', 'justify-center');
+                  const placeholder = document.createElement('div');
+                  placeholder.className = 'placeholder-icon';
+                  placeholder.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 dark:text-gray-500"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`;
+                  parent.appendChild(placeholder);
+                }
+              }}
             />
           </div>
         ) : (

@@ -1,27 +1,29 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { WohnungResponse, PaginationResult } from '@/types';
-import { WohnungsCard } from './wohnungs-card';
-import Pagination from './pagination';
+"use client";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { WohnungResponse, PaginationResult } from "@/types";
+import { WohnungsCard } from "./wohnungs-card";
+import Pagination from "./pagination";
 
 function WohnungsCardSkeleton() {
   return (
-    <div className="w-full h-[400px] bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-      <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 animate-pulse" />
-      <div className="p-4 space-y-4">
-        <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-        <div className="space-y-2">
-          <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-          <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-        </div>
-        <div className="flex justify-between items-center">
-          <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-          <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+    <div className="hover:shadow-lg transition-shadow duration-300">
+      <div className="w-full h-[400px] bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+        <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+        <div className="p-4 space-y-4">
+          <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="space-y-2">
+            <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 const transformWohnung = (wohnung: WohnungResponse) => ({
@@ -39,8 +41,8 @@ const transformWohnung = (wohnung: WohnungResponse) => ({
   bilder: wohnung.bilder || [],
   user: {
     ...wohnung.user,
-    telefon: "" // Default empty string since it's missing from the response
-  }
+    telefon: "", // Default empty string since it's missing from the response
+  },
 });
 
 export default function WohnungsGrid() {
@@ -54,20 +56,25 @@ export default function WohnungsGrid() {
       setLoading(true);
       try {
         const queryString = searchParams.toString();
-        console.log('Fetching wohnungen with query:', queryString || 'no query params');
+        console.log(
+          "Fetching wohnungen with query:",
+          queryString || "no query params"
+        );
         const response = await fetch(`/api/wohnungen?${queryString}`);
         const data = await response.json();
-        console.log('Received wohnungen:', data);
+        console.log("Received wohnungen:", data);
 
         if (!response.ok) {
-          throw new Error(data.error || 'Fehler beim Laden der Wohnungen');
+          throw new Error(data.error || "Fehler beim Laden der Wohnungen");
         }
-        console.log('Setting wohnungen state with:', data.data.length, 'items');
+        console.log("Setting wohnungen state with:", data.data.length, "items");
         setWohnungen(data.data);
         setPagination(data.pagination);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten');
+        setError(
+          err instanceof Error ? err.message : "Ein Fehler ist aufgetreten"
+        );
       } finally {
         setLoading(false);
       }
@@ -105,9 +112,9 @@ export default function WohnungsGrid() {
 
   return (
     <div className="container mx-auto px-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         {wohnungen.map((wohnung) => (
-          <WohnungsCard key={wohnung.id} wohnung={transformWohnung(wohnung)} />
+          <WohnungsCard key={wohnung.id} wohnung={transformWohnung(wohnung)} className="hover:shadow-md transition-shadow duration-300" />
         ))}
       </div>
       {pagination && (

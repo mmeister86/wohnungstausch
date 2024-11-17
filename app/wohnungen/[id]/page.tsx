@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import WohnungsDetail, { WohnungsDetailSkeleton } from '@/components/wohnungen/wohnungs-detail'
+import WohnungsKontakt, { WohnungsKontaktSkeleton } from '@/components/wohnungen/wohnungs-kontakt'
 import { ArrowLeft } from 'lucide-react'
 
 interface GeoJSONPoint {
@@ -34,6 +35,7 @@ interface Wohnung {
   user: {
     name: string;
     email: string;
+    telefon: string;
   };
 }
 
@@ -106,14 +108,21 @@ export default function WohnungDetailsPage({ params }: WohnungDetailsPageProps) 
           <ArrowLeft className="w-4 h-4 mr-2" />
           Zurück zur Übersicht
         </Link>
-        <WohnungsDetailSkeleton />
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="w-full md:w-3/4">
+            <WohnungsDetailSkeleton />
+          </div>
+          <aside className="w-full md:w-1/4 sticky top-[76px]!important">
+            <WohnungsKontaktSkeleton />
+          </aside>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="container mx-auto py-8">
-      <Link href="/wohnungen" className="inline-flex items-center mb-4 text-blue-600 hover:text-blue-800">
+      <Link href="/wohnungen" className="inline-flex items-center mb-4 text-green-600 hover:text-green-800">
         <ArrowLeft className="w-4 h-4 mr-2" />
         Zurück zur Übersicht
       </Link>
@@ -123,7 +132,14 @@ export default function WohnungDetailsPage({ params }: WohnungDetailsPageProps) 
           <p>{error}</p>
         </div>
       ) : wohnung ? (
-        <WohnungsDetail wohnung={wohnung} />
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="w-full md:w-3/4">
+            <WohnungsDetail wohnung={wohnung} />
+          </div>
+          <aside className="w-full md:w-1/4 sticky top-[76px] h-fit">
+            <WohnungsKontakt user={wohnung.user} />
+          </aside>
+        </div>
       ) : (
         <div className="p-4 text-gray-600">Lädt...</div>
       )}

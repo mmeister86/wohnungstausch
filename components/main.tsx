@@ -10,7 +10,7 @@ export default function Main() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="max-w-[38rem]">
-              <h1 className="text-4xl font-bold tracking-tight text-black dark:text-white sm:text-5xl md:text-6xl">
+              <h1 className="text-7xl font-bold tracking-tight text-black dark:text-white sm:text-5xl md:text-6xl">
                 Trennungsgeld-Wohnungstausch leicht gemacht
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">

@@ -12,7 +12,7 @@ import { MapPin, Save } from "lucide-react"
 
 export default function Suche() {
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 mt-6">
+    <div className="w-full max-w-6xl mx-auto p-4 pt-10">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <div className="w-full">
           <Select>
