@@ -112,7 +112,7 @@ export default function WohnungDetailsPage({ params }: WohnungDetailsPageProps) 
           <div className="w-full md:w-3/4">
             <WohnungsDetailSkeleton />
           </div>
-          <aside className="w-full md:w-1/4 sticky top-[76px]!important">
+          <aside className="w-full md:w-1/4 sticky top-[84px] h-fit">
             <WohnungsKontaktSkeleton />
           </aside>
         </div>
@@ -136,7 +136,7 @@ export default function WohnungDetailsPage({ params }: WohnungDetailsPageProps) 
           <div className="w-full md:w-3/4">
             <WohnungsDetail wohnung={wohnung} />
           </div>
-          <aside className="w-full md:w-1/4 sticky top-[76px] h-fit">
+          <aside className="w-full md:w-1/4 sticky top-[84px] h-fit">
             <WohnungsKontakt user={wohnung.user} />
           </aside>
         </div>

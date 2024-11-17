@@ -22,6 +22,7 @@
     "@radix-ui/react-toast": "^1.2.2",
     "@supabase/supabase-js": "^2.46.1",
     "@types/leaflet-routing-machine": "^3.2.8",
+    "@types/styled-components": "^5.1.34",
     "@vercel/speed-insights": "^1.0.14",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -33,6 +34,7 @@
     "react": "18.x",
     "react-dom": "18.x",
     "react-leaflet": "^4.2.1",
+    "styled-components": "^6.1.13",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7"
   },

@@ -96,8 +96,8 @@ const WohnungsFormularTipps = ({
   const activeTipp = activeField ? tippsMap[activeField] : null;
 
   return (
-    <div className="sticky top-[76px]">
-      <Card className={`${className} bg-slate-50 shadow-sm`}>
+    <div className="sticky top-[84px]">
+      <Card className={`${className} bg-white shadow-sm`}>
         <CardHeader className="bg-white">
           <CardTitle className="text-lg">
             {activeTipp ? activeTipp.title : "Ausfüllhilfe"}

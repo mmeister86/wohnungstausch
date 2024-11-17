@@ -8,17 +8,39 @@ import Pagination from "./pagination";
 function WohnungsCardSkeleton() {
   return (
     <div className="hover:shadow-lg transition-shadow duration-300">
-      <div className="w-full h-[400px] bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+      <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
         <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 animate-pulse" />
         <div className="p-4 space-y-4">
+          {/* Titel */}
           <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-          <div className="space-y-2">
-            <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          
+          {/* Adresse */}
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
             <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
           </div>
-          <div className="flex justify-between items-center">
-            <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-            <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          
+          {/* Grid mit 4 Items */}
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+          
+          {/* Kontakt Sektion */}
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+            <div className="space-y-2">
+              {[...Array(3)].map((_, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <div className="w-16 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -27,22 +49,19 @@ function WohnungsCardSkeleton() {
 }
 
 const transformWohnung = (wohnung: WohnungResponse) => ({
-  id: String(wohnung.id),
+  id: wohnung.id,
   titel: wohnung.titel,
-  beschreibung: "", // Default empty string since it's missing from the response
-  strasse: `${wohnung.strasse} ${wohnung.hausnummer}`,
+  beschreibung: wohnung.beschreibung,
+  strasse: wohnung.strasse,
+  hausnummer: wohnung.hausnummer,
   plz: wohnung.plz,
-  ort: wohnung.stadt,
-  kaltmiete: wohnung.miete, // Assuming miete is kaltmiete
-  warmmiete: wohnung.miete, // Using same value since we don't have warmmiete
-  wohnflaeche: wohnung.flaeche,
+  stadt: wohnung.stadt,
+  miete: wohnung.miete,
+  flaeche: wohnung.flaeche,
   zimmer: wohnung.zimmer,
   stellplatz: wohnung.stellplatz,
   bilder: wohnung.bilder || [],
-  user: {
-    ...wohnung.user,
-    telefon: "", // Default empty string since it's missing from the response
-  },
+  user: wohnung.user
 });
 
 export default function WohnungsGrid() {

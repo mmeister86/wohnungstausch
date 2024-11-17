@@ -16,6 +16,7 @@ import {
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import { geocodeAddress } from "@/lib/geocoding";
+import Loader from '../ui/Loader';
 
 const PermanentLocationsMap = dynamic(
   () => import("@/components/permanent-locations-map"),
@@ -313,10 +314,7 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
                 </div>
               ) : !coordinates ? (
                 <div className="flex items-center justify-center h-full bg-gray-100">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-gray-600">Karte wird geladen...</p>
-                  </div>
+                  <Loader />
                 </div>
               ) : (
                 <PermanentLocationsMap
