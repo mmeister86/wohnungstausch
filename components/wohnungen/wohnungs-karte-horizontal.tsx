@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { Square, CarFront, Euro, Bed, Home } from "lucide-react";
+import { CheckCircle, Ban, Euro, Bed, Home, House } from "lucide-react";
 import { WohnungResponse } from "@/types";
 
 interface WohnungProps {
@@ -91,7 +91,7 @@ export default function WohnungsCardHorizontal({ wohnung }: WohnungProps) {
         <CardContent className="py-2 px-0">
           <div className="flex gap-4">
             <span className="text-sm flex items-center gap-1">
-              <Square className="h-4 w-4" /> {flaeche}m²
+              <House className="h-4 w-4" /> {flaeche}m²
             </span>
             <span className="text-sm flex items-center gap-1">
               <Bed className="h-4 w-4" /> {zimmer} Zimmer
@@ -100,11 +100,11 @@ export default function WohnungsCardHorizontal({ wohnung }: WohnungProps) {
               <Euro className="h-4 w-4" /> {miete}€
             </span>
             <span className="text-sm flex items-center gap-1">
-              <CarFront
-                className={`h-4 w-4 ${
-                  stellplatz ? "text-green-600" : "text-gray-400"
-                }`}
-              />
+              {stellplatz ? (
+                <CheckCircle className="h-4 w-4 text-green-600" />
+              ) : (
+                <Ban className="h-4 w-4 text-red-600" />
+              )}
               {stellplatz ? "inkl. Stellplatz" : "ohne Stellplatz"}
             </span>
           </div>

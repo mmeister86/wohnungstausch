@@ -96,12 +96,12 @@ export function WohnungsCard({ wohnung, className }: WohnungProps) {
               {wohnung.stellplatz ? (
                 <>
                   <CheckCircle className="w-4 h-4 mr-1 text-green-700" />
-                  <span>Stellplatz</span>
+                  <span>inkl. Stellplatz</span>
                 </>
               ) : (
                 <>
                   <Ban className="w-4 h-4 mr-1 text-red-600" />
-                  <span>Kein Stellplatz</span>
+                  <span>ohne Stellplatz</span>
                 </>
               )}
             </div>

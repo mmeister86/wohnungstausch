@@ -8,15 +8,17 @@ import {
   MapPin,
   Euro,
   Home,
-  ParkingSquare,
   ChevronLeft,
   ChevronRight,
   Bed,
+  CheckCircle,
+  Ban,
+  Pencil,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import { geocodeAddress } from "@/lib/geocoding";
-import Loader from '../ui/Loader';
+import Loader from "../ui/Loader";
 
 const PermanentLocationsMap = dynamic(
   () => import("@/components/permanent-locations-map"),
@@ -168,9 +170,16 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
   return (
     <Card className="w-full bg-white dark:bg-gray-800 rounded-lg">
       <CardHeader>
-        <CardTitle className="text-3xl font-bold text-gray-800 dark:text-gray-100">
-          {titel}
-        </CardTitle>
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-2xl font-bold">{titel}</CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-black dark:text-white"
+          >
+            <Pencil className="w-4 h-4 mr-1" /> Bearbeiten
+          </Button>
+        </div>
         <div className="flex items-center text-gray-600 dark:text-gray-300 mt-2">
           <MapPin className="w-5 h-5 mr-2" />
           <span>{adresse}</span>
@@ -211,12 +220,18 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
                   onError={(e) => {
                     // Wenn das Bild nicht geladen werden kann, zeige den Platzhalter
                     const target = e.target as HTMLElement;
-                    target.style.display = 'none';
+                    target.style.display = "none";
                     const parent = target.parentElement;
-                    if (parent && !parent.querySelector('.placeholder-icon')) {
-                      parent.classList.add('bg-gray-200', 'dark:bg-gray-700', 'flex', 'items-center', 'justify-center');
-                      const placeholder = document.createElement('div');
-                      placeholder.className = 'placeholder-icon';
+                    if (parent && !parent.querySelector(".placeholder-icon")) {
+                      parent.classList.add(
+                        "bg-gray-200",
+                        "dark:bg-gray-700",
+                        "flex",
+                        "items-center",
+                        "justify-center"
+                      );
+                      const placeholder = document.createElement("div");
+                      placeholder.className = "placeholder-icon";
                       placeholder.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 dark:text-gray-500"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`;
                       parent.appendChild(placeholder);
                     }
@@ -251,12 +266,21 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
                       onError={(e) => {
                         // Wenn das Thumbnail nicht geladen werden kann, zeige den Platzhalter
                         const target = e.target as HTMLElement;
-                        target.style.display = 'none';
+                        target.style.display = "none";
                         const parent = target.parentElement;
-                        if (parent && !parent.querySelector('.placeholder-icon')) {
-                          parent.classList.add('bg-gray-200', 'dark:bg-gray-700', 'flex', 'items-center', 'justify-center');
-                          const placeholder = document.createElement('div');
-                          placeholder.className = 'placeholder-icon';
+                        if (
+                          parent &&
+                          !parent.querySelector(".placeholder-icon")
+                        ) {
+                          parent.classList.add(
+                            "bg-gray-200",
+                            "dark:bg-gray-700",
+                            "flex",
+                            "items-center",
+                            "justify-center"
+                          );
+                          const placeholder = document.createElement("div");
+                          placeholder.className = "placeholder-icon";
                           placeholder.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 dark:text-gray-500"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`;
                           parent.appendChild(placeholder);
                         }
@@ -284,11 +308,11 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
             <span className="text-lg">{miete} €/Monat</span>
           </div>
           <div className="flex items-center space-x-2">
-            <ParkingSquare
-              className={`w-5 h-5 ${
-                stellplatz ? "text-emerald-600" : "text-gray-400"
-              }`}
-            />
+            {stellplatz ? (
+              <CheckCircle className="w-5 h-5 text-green-600" />
+            ) : (
+              <Ban className="w-5 h-5 text-red-600" />
+            )}
             <span className="text-lg">
               {stellplatz ? "Stellplatz vorhanden" : "Kein Stellplatz"}
             </span>
@@ -322,8 +346,10 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
                 />
               )}
             </div>
-          ) : null}
+                  ) : null}
+                  <p className="text-xs text-gray-600 dark:text-gray-400 pt-6">* die hier dargestellten Routen werden automatisch generiert. Das sind nicht zwingend die kürzesten Wege zur Dienststelle, aber sie geben einen ersten Anhalt zur Orientierung.</p>
         </div>
+
       </CardContent>
     </Card>
   );

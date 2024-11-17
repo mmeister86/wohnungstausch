@@ -1,5 +1,4 @@
-
-import Image from "next/image"
+import Image from "next/image";
 
 export default function HowItWorks() {
   return (
@@ -17,7 +16,7 @@ export default function HowItWorks() {
                 alt="So funktioniert der Wohnungstausch"
                 fill
                 sizes="(max-width: 1024px) 100vw, 500px"
-                style={{ objectFit: 'contain' }}
+                style={{ objectFit: "contain" }}
                 className="rounded-lg"
                 quality={90}
               />
@@ -27,29 +26,62 @@ export default function HowItWorks() {
           <div className="space-y-8">
             {[
               {
-                title: "Erstellen Sie Ihr Wohnungsangebot",
-                description: "Beschreiben Sie Ihre aktuelle Wohnung und fügen Sie relevante Daten hinzu."
+                title: "Finden Sie passende Tauschangebote",
+                description: (
+                  <>
+                    Durchsuchen Sie verfügbare Angebote gemäß ihrer Kriterien.{" "}
+                    <br />
+                    Natürlich brauchen Sie keine eigene Anzeige, um die Inserate
+                    anzuschauen.
+                  </>
+                ),
               },
               {
-                title: "Finden Sie passende Tauschangebote",
-                description: "Durchsuchen Sie  verfügbare Angebote gemäß ihrer Kriterien."
+                title: "Erstellen Sie Ihr Wohnungsangebot",
+                description: (
+                  <>
+                    Beschreiben Sie Ihre aktuelle Wohnung und fügen Sie
+                    relevante Daten hinzu. <br /> Dazu müssen Sie sich zunächst
+                    registrieren, z.B. mit ihrer dienstlichen Mailadresse.
+                  </>
+                ),
               },
+
               {
                 title: "Kontaktieren Sie potenzielle Tauschpartner",
-                description: "Treten Sie direkt mit relevanten Tauschpartnern in Kontakt."
+                description: (
+                  <>
+                    Treten Sie direkt mit relevanten Tauschpartnern in Kontakt.
+                    <br />
+                    Nutzen Sie dazu e-Mail oder Telefon.
+                  </>
+                ),
               },
               {
                 title: "Organisieren Sie den Wohnungstausch",
-                description: "Klären Sie alle Details und wickeln Sie den Tausch sicher ab."
-              }
+                description: (
+                  <>
+                    Klären Sie alle Details und wickeln Sie den Tausch sicher
+                    ab.
+                    <br />
+                    Binden Sie ihren Vermieter am besten frühzeitig ein.
+                  </>
+                ),
+              },
             ].map((step, index) => (
-              <div key={index} className="relative flex items-start">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-black dark:bg-white">
-                  <span className="text-sm font-semibold text-white dark:text-black">{index + 1}</span>
+              <div key={index} className="relative flex items-center">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-black dark:bg-white mr-4">
+                  <span className="text-sm font-semibold text-white dark:text-black">
+                    {index + 1}
+                  </span>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-black dark:text-white">{step.title}</h3>
-                  <p className="mt-2 text-base text-gray-600 dark:text-gray-400">{step.description}</p>
+                  <h3 className="text-lg font-semibold text-black dark:text-white">
+                    {step.title}
+                  </h3>
+                  <p className="mt-2 text-base text-gray-600 dark:text-gray-400">
+                    {step.description}
+                  </p>
                 </div>
               </div>
             ))}
@@ -57,5 +89,5 @@ export default function HowItWorks() {
         </div>
       </div>
     </section>
-  )
+  );
 }
