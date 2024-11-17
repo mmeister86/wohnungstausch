@@ -20,9 +20,8 @@ export default function Footer() {
           </div>
           <div id="about">
             <h3 className="text-sm font-semibold text-black dark:text-white mb-4">Über uns</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Diese Plattform ist ein privates Projekt anlässlich der Aufstellung OFK 
-              und hat keinen Bezug zum Dienstherrn und der zu erwartenden Umzüge i.R. von Versetzungen. 
-              Bei Fragen, Bugs oder Problemen bitte an meine eMail-Adresse schreiben oder einfach anrufen.
+            <p className="text-sm text-gray-600 dark:text-gray-400">Diese Plattform ist ein privates Projekt anlässlich der Aufstellung OFK
+              und hat keinen Bezug zum Dienstherrn und der zu erwartenden Umzüge i.R. von Versetzungen. Dieses Portal ersetzt auch keine Wohnungsfürsorge, sondern ist meine Art, ein zu erwartendes Problem anlässlich der geringen Verfügbarkeit von geeigneten TG-Wohnungen zu lösen. <br/> Bei Fragen, Bugs oder Problemen bitte an meine eMail-Adresse schreiben oder einfach anrufen.
             </p>
           </div>
         </div>

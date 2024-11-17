@@ -20,8 +20,8 @@ export default function Header() {
             <Link href="/wohnungen" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
               Wohnungen
             </Link>
-            <Link href="#about" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
-              Über das Projekt
+            <Link href="/create" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
+              Wohnung einstellen
             </Link>
             <Button variant="outline" className="h-8 px-4 text-sm font-medium">
               Login
@@ -36,8 +36,8 @@ export default function Header() {
                 <Link href="/wohnungen" className="block text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
                   Wohnungen
                 </Link>
-                <Link href="#about" className="block text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
-                  Über das Projekt
+                <Link href="/create" className="block text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
+                  Wohnung einstellen
                 </Link>
                 <Button variant="outline" className="w-full h-8 px-4 text-sm font-medium">
                   Login

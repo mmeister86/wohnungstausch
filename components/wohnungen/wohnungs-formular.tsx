@@ -12,12 +12,40 @@ import { Upload, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useToast } from "@/hooks/use-toast"
 
-export default function WohnungstauschFormular() {
+interface FormData {
+  titel: string;
+  beschreibung: string;
+  strasse: string;
+  hausnummer: string;
+  plz: string;
+  stadt: string;
+  flaeche: string;
+  zimmer: string;
+  kaltmiete: number;
+  nebenkosten: number;
+  stromkosten: number;
+  heizkosten: number;
+  name: string;
+  telefon: string;
+  email: string;
+  dienstgrad: string;
+  stellplatz: boolean;
+}
+
+type FormField = keyof FormData;
+
+interface WohnungstauschFormularProps {
+  className?: string;
+  onFieldFocus?: (field: FormField | null) => void;
+}
+
+const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormularProps) => {
   const router = useRouter()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [photos, setPhotos] = useState<File[]>([])
-  const [formData, setFormData] = useState({
+  const [activeField, setActiveField] = useState<FormField | null>(null)
+  const [formData, setFormData] = useState<FormData>({
     titel: '',
     beschreibung: '',
     strasse: '',
@@ -36,6 +64,16 @@ export default function WohnungstauschFormular() {
     dienstgrad: '',
     stellplatz: false
   })
+
+  const handleInputFocus = (fieldName: FormField) => {
+    setActiveField(fieldName);
+    onFieldFocus?.(fieldName);
+  }
+
+  const handleInputBlur = () => {
+    setActiveField(null);
+    onFieldFocus?.(null);
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -56,6 +94,20 @@ export default function WohnungstauschFormular() {
     e.preventDefault()
     setIsSubmitting(true)
 
+    // Validiere required fields
+    const requiredFields: FormField[] = ['titel', 'strasse', 'hausnummer', 'plz', 'stadt', 'flaeche', 'zimmer', 'kaltmiete', 'name', 'email']
+    const missingFields = requiredFields.filter(field => !formData[field])
+    
+    if (missingFields.length > 0) {
+      toast({
+        variant: "destructive",
+        title: "Fehlende Pflichtfelder",
+        description: `Bitte füllen Sie folgende Felder aus: ${missingFields.join(', ')}`,
+      })
+      setIsSubmitting(false)
+      return
+    }
+
     try {
       // Bilder in Base64 konvertieren
       const imagePromises = photos.map(file => {
@@ -71,23 +123,37 @@ export default function WohnungstauschFormular() {
 
       const base64Images = await Promise.all(imagePromises)
 
+      // Parse numeric values
+      const numericFormData = {
+        ...formData,
+        flaeche: parseFloat(formData.flaeche),
+        zimmer: parseInt(formData.zimmer),
+        kaltmiete: parseFloat(formData.kaltmiete.toString()),
+        nebenkosten: parseFloat(formData.nebenkosten.toString()) || 0,
+        stromkosten: parseFloat(formData.stromkosten.toString()) || 0,
+        heizkosten: parseFloat(formData.heizkosten.toString()) || 0,
+      }
+
       const response = await fetch('/api/wohnungen/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
+          ...numericFormData,
           bilder: base64Images,
-          flaeche: parseFloat(formData.flaeche),
-          zimmer: parseInt(formData.zimmer),
         }),
       })
 
+      const responseData = await response.json()
+
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Error response:', errorData);
-        throw new Error(`Fehler beim Speichern der Wohnung: ${JSON.stringify(errorData)}`);
+        console.error('Error response:', responseData)
+        throw new Error(responseData.details || 'Fehler beim Speichern der Wohnung')
+      }
+
+      if (!responseData.success) {
+        throw new Error(responseData.error || 'Fehler beim Speichern der Wohnung')
       }
 
       // Erfolgreich gespeichert
@@ -96,10 +162,16 @@ export default function WohnungstauschFormular() {
         title: "Wohnung erfolgreich erstellt",
         description: "Ihre Wohnung wurde erfolgreich in unserer Datenbank gespeichert.",
       })
-      router.refresh() // Aktualisiere die Wohnungsliste
+      
+      // Redirect to the new apartment's detail page
+      router.push(`/wohnungen/${responseData.wohnung.id}`)
     } catch (error) {
       console.error('Error:', error)
-      // Hier könnte man einen Fehler-State setzen und dem Benutzer anzeigen
+      toast({
+        variant: "destructive",
+        title: "Fehler",
+        description: error instanceof Error ? error.message : 'Ein unbekannter Fehler ist aufgetreten',
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -160,7 +232,7 @@ export default function WohnungstauschFormular() {
   }
 
   return (
-    <Card className="w-full max-w-6xl mx-auto overflow-hidden  relative">
+    <Card className={`w-full max-w-6xl mx-auto overflow-hidden relative ${className}`}>
       <CardHeader>
         <CardTitle className="text-gray-800 dark:text-gray-100">Wohnungstausch Anzeige erstellen</CardTitle>
       </CardHeader>
@@ -179,6 +251,8 @@ export default function WohnungstauschFormular() {
                 name="titel"
                 value={formData.titel}
                 onChange={handleInputChange}
+                onFocus={() => handleInputFocus('titel')}
+                onBlur={handleInputBlur}
                 placeholder="z.B. Gemütliche 2-Zimmer-Wohnung in Kreuzberg"
                 className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
               />
@@ -196,6 +270,8 @@ export default function WohnungstauschFormular() {
                 name="beschreibung"
                 value={formData.beschreibung}
                 onChange={handleInputChange}
+                onFocus={() => handleInputFocus('beschreibung')}
+                onBlur={handleInputBlur}
                 placeholder="Beschreiben Sie Ihre Wohnung..."
                 className="min-h-[100px] bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
               />
@@ -214,6 +290,8 @@ export default function WohnungstauschFormular() {
                     name="strasse"
                     value={formData.strasse}
                     onChange={handleAddressChange}
+                    onFocus={() => handleInputFocus('strasse')}
+                    onBlur={handleInputBlur}
                     placeholder="Straße"
                     className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   />
@@ -224,6 +302,8 @@ export default function WohnungstauschFormular() {
                     name="hausnummer"
                     value={formData.hausnummer}
                     onChange={handleAddressChange}
+                    onFocus={() => handleInputFocus('hausnummer')}
+                    onBlur={handleInputBlur}
                     placeholder="Hausnummer"
                     className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   />
@@ -236,6 +316,8 @@ export default function WohnungstauschFormular() {
                     name="plz"
                     value={formData.plz}
                     onChange={handleAddressChange}
+                    onFocus={() => handleInputFocus('plz')}
+                    onBlur={handleInputBlur}
                     placeholder="PLZ"
                     className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   />
@@ -246,6 +328,8 @@ export default function WohnungstauschFormular() {
                     name="stadt"
                     value={formData.stadt}
                     onChange={handleAddressChange}
+                    onFocus={() => handleInputFocus('stadt')}
+                    onBlur={handleInputBlur}
                     placeholder="Stadt"
                     className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   />
@@ -267,6 +351,8 @@ export default function WohnungstauschFormular() {
                   type="number"
                   value={formData.flaeche}
                   onChange={handleInputChange}
+                  onFocus={() => handleInputFocus('flaeche')}
+                  onBlur={handleInputBlur}
                   placeholder="z.B. 70"
                   className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                 />
@@ -285,6 +371,8 @@ export default function WohnungstauschFormular() {
                   type="number"
                   value={formData.zimmer}
                   onChange={handleInputChange}
+                  onFocus={() => handleInputFocus('zimmer')}
+                  onBlur={handleInputBlur}
                   placeholder="z.B. 2"
                   className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                 />
@@ -335,6 +423,8 @@ export default function WohnungstauschFormular() {
                     type="number"
                     value={formData.kaltmiete}
                     onChange={handleMieteChange}
+                    onFocus={() => handleInputFocus('kaltmiete')}
+                    onBlur={handleInputBlur}
                     placeholder="z.B. 500"
                     className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   />
@@ -352,6 +442,8 @@ export default function WohnungstauschFormular() {
                     type="number"
                     value={formData.nebenkosten}
                     onChange={handleMieteChange}
+                    onFocus={() => handleInputFocus('nebenkosten')}
+                    onBlur={handleInputBlur}
                     placeholder="z.B. 150"
                     className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   />
@@ -369,6 +461,8 @@ export default function WohnungstauschFormular() {
                     type="number"
                     value={formData.stromkosten}
                     onChange={handleMieteChange}
+                    onFocus={() => handleInputFocus('stromkosten')}
+                    onBlur={handleInputBlur}
                     placeholder="z.B. 50"
                     className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   />
@@ -386,6 +480,8 @@ export default function WohnungstauschFormular() {
                     type="number"
                     value={formData.heizkosten}
                     onChange={handleMieteChange}
+                    onFocus={() => handleInputFocus('heizkosten')}
+                    onBlur={handleInputBlur}
                     placeholder="z.B. 80"
                     className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   />
@@ -528,6 +624,8 @@ export default function WohnungstauschFormular() {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
+                  onFocus={() => handleInputFocus('name')}
+                  onBlur={handleInputBlur}
                   placeholder="Vor- und Nachname"
                   className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                 />
@@ -544,6 +642,8 @@ export default function WohnungstauschFormular() {
                   name="telefon"
                   value={formData.telefon}
                   onChange={handleInputChange}
+                  onFocus={() => handleInputFocus('telefon')}
+                  onBlur={handleInputBlur}
                   type="tel"
                   placeholder="z.B. 0123 45678900"
                   className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
@@ -561,6 +661,8 @@ export default function WohnungstauschFormular() {
                   name="email"
                   value={formData.email}
                   onChange={handleEmailChange}
+                  onFocus={() => handleInputFocus('email')}
+                  onBlur={handleInputBlur}
                   type="email"
                   placeholder="ihre.email@example.com"
                   className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
@@ -583,3 +685,5 @@ export default function WohnungstauschFormular() {
     </Card>
   );
 }
+
+export default WohnungstauschFormular;

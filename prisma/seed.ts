@@ -3,6 +3,19 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
+  // Create users first
+  const users = [
+    { id: "user1", name: "Max Mustermann", email: "max@example.com", telefon: "0123456789" },
+    { id: "user2", name: "Anna Schmidt", email: "anna@example.com", telefon: "0987654321" },
+    { id: "user3", name: "Tom Weber", email: "tom@example.com", telefon: "0123987456" }
+  ]
+
+  for (const user of users) {
+    await prisma.user.create({
+      data: user
+    })
+  }
+
   const wohnungen = [
     {
       titel: "Moderne 2-Zimmer-Wohnung mit Balkon",
@@ -15,7 +28,9 @@ async function main() {
       zimmer: 2,
       miete: 850.00,
       bilder: ["/wohnungen/wohnung1.jpg"],
-      userId: "user1"
+      userId: "user1",
+      updatedAt: new Date(),
+      stellplatz: true
     },
     {
       titel: "Geräumige 3-Zimmer-Altbauwohnung",
@@ -28,7 +43,9 @@ async function main() {
       zimmer: 3,
       miete: 1200.00,
       bilder: ["/wohnungen/wohnung2.jpg"],
-      userId: "user2"
+      userId: "user2",
+      updatedAt: new Date(),
+      stellplatz: false
     },
     {
       titel: "Moderne 1-Zimmer-Wohnung",
@@ -41,7 +58,9 @@ async function main() {
       zimmer: 1,
       miete: 650.00,
       bilder: ["/wohnungen/wohnung3.jpg"],
-      userId: "user3"
+      userId: "user3",
+      updatedAt: new Date(),
+      stellplatz: false
     }
   ]
 

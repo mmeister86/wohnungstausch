@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import WohnungsDetail from '@/components/wohnungen/wohnungs-detail'
-import { Button } from '@/components/ui/button'
+import WohnungsDetail, { WohnungsDetailSkeleton } from '@/components/wohnungen/wohnungs-detail'
 import { ArrowLeft } from 'lucide-react'
 
 interface GeoJSONPoint {
@@ -47,28 +46,70 @@ interface WohnungDetailsPageProps {
 export default function WohnungDetailsPage({ params }: WohnungDetailsPageProps) {
   const [wohnung, setWohnung] = useState<Wohnung | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
     const fetchWohnung = async () => {
+      setIsLoading(true)
+      setError(null)
       try {
+        console.log('Fetching wohnung with ID:', params.id)
         const response = await fetch(`/api/wohnungen/${params.id}`)
+        console.log('Response status:', response.status)
+        const data = await response.json()
+        console.log('Response data:', data)
+
         if (!response.ok) {
           if (response.status === 404) {
+            console.log('Wohnung not found, redirecting to 404')
             router.push('/not-found')
             return
           }
-          throw new Error('Fehler beim Laden der Wohnung')
+          throw new Error(data.error || 'Fehler beim Laden der Wohnung')
         }
-        const data = await response.json()
+
+        if (!data || typeof data !== 'object') {
+          console.error('Invalid response data:', data)
+          throw new Error('Ungültige Daten vom Server erhalten')
+        }
+
         setWohnung(data)
       } catch (error) {
-        setError(error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten')
+        console.error('Error fetching wohnung:', error)
+        if (error instanceof Error) {
+          console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+          })
+        }
+        setError(
+          error instanceof Error
+            ? `${error.message}${error.cause ? ` (${error.cause})` : ''}`
+            : 'Ein unbekannter Fehler ist aufgetreten'
+        )
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    fetchWohnung()
+    if (params.id) {
+      fetchWohnung()
+    }
   }, [params.id, router])
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8">
+        <Link href="/wohnungen" className="inline-flex items-center mb-4 text-green-600 hover:text-green-800">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Zurück zur Übersicht
+        </Link>
+        <WohnungsDetailSkeleton />
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto py-8">
@@ -77,9 +118,14 @@ export default function WohnungDetailsPage({ params }: WohnungDetailsPageProps) 
         Zurück zur Übersicht
       </Link>
       {error ? (
-        <div className="text-red-500">{error}</div>
-      ) : (
+        <div className="p-4 mb-4 text-red-700 bg-red-100 rounded-lg">
+          <p className="font-bold">Fehler</p>
+          <p>{error}</p>
+        </div>
+      ) : wohnung ? (
         <WohnungsDetail wohnung={wohnung} />
+      ) : (
+        <div className="p-4 text-gray-600">Lädt...</div>
       )}
     </div>
   )

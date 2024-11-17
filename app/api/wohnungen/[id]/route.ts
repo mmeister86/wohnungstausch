@@ -1,41 +1,141 @@
 import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
+
+const MAX_RETRIES = 3
+const RETRY_DELAY = 1000 // 1 Sekunde
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+async function fetchWohnungByIdWithRetry(id: number, retries = MAX_RETRIES): Promise<any> {
+  try {
+    console.log(`[API] Attempting to fetch wohnung with ID ${id} (attempt ${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`)
+
+    const wohnung = await prisma.wohnung.findUnique({
+      where: {
+        id: id
+      },
+      include: {
+        user: true,
+        location: true
+      }
+    })
+
+    console.log('[API] Raw database response:', wohnung)
+
+    if (!wohnung) {
+      console.log(`[API] No wohnung found with ID ${id}`)
+      return { 
+        success: false, 
+        error: 'Wohnung nicht gefunden',
+        status: 404 
+      }
+    }
+
+    // Transform the data to match the expected interface
+    const transformedData = {
+      id: wohnung.id,
+      createdAt: wohnung.createdAt.toISOString(),
+      updatedAt: wohnung.updatedAt.toISOString(),
+      titel: wohnung.titel,
+      beschreibung: wohnung.beschreibung,
+      strasse: wohnung.strasse,
+      hausnummer: wohnung.hausnummer,
+      plz: wohnung.plz,
+      stadt: wohnung.stadt,
+      flaeche: wohnung.flaeche,
+      zimmer: wohnung.zimmer,
+      miete: wohnung.miete,
+      stellplatz: wohnung.stellplatz,
+      userId: wohnung.userId,
+      bilder: wohnung.bilder || [],
+      location: wohnung.location ? {
+        coordinates: wohnung.location.coordinates,
+        wohnungId: wohnung.location.wohnungId
+      } : undefined,
+      user: {
+        name: wohnung.user?.name || '',
+        email: wohnung.user?.email || '',
+        telefon: wohnung.user?.telefon || ''
+      }
+    }
+
+    console.log('[API] Transformed data:', transformedData)
+    return { success: true, data: transformedData }
+  } catch (error) {
+    console.error('[API] Error details:', {
+      name: error instanceof Error ? error.name : 'Unknown error type',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      isPrismaError: error instanceof Prisma.PrismaClientKnownRequestError,
+      errorCode: error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined
+    })
+    
+    if (retries <= 1) {
+      let errorMessage = 'Ein Fehler ist aufgetreten beim Laden der Wohnung'
+      let errorDetails = ''
+      
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (error.code) {
+          case 'P2021':
+            errorMessage = 'Die Datenbanktabelle existiert nicht'
+            break
+          case 'P2002':
+            errorMessage = 'Ein Eindeutigkeitsfehler ist aufgetreten'
+            break
+          case 'P2025':
+            errorMessage = 'Die Wohnung wurde nicht gefunden'
+            break
+          default:
+            errorMessage = `Datenbankfehler (${error.code})`
+        }
+        errorDetails = error.message
+      } else if (error instanceof Error) {
+        errorDetails = error.message
+      }
+      
+      return { 
+        success: false, 
+        error: errorMessage,
+        details: errorDetails,
+        status: 500
+      }
+    }
+    
+    await delay(RETRY_DELAY)
+    return fetchWohnungByIdWithRetry(id, retries - 1)
+  }
+}
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  try {
-    const wohnung = await prisma.wohnung.findUnique({
-      where: {
-        id: parseInt(params.id)
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            telefon: true
-          }
-        },
-        location: true
-      }
-    })
-
-    if (!wohnung) {
-      return NextResponse.json(
-        { error: 'Wohnung nicht gefunden' },
-        { status: 404 }
-      )
-    }
-
-    return NextResponse.json(wohnung)
-  } catch (error) {
-    console.error('Error fetching wohnung:', error)
+  console.log('[API] Received request for wohnung ID:', params.id)
+  
+  // Validate id parameter
+  const id = parseInt(params.id)
+  if (isNaN(id)) {
+    console.error('[API] Invalid ID format:', params.id)
     return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
+      { error: 'Ungültige ID: ID muss eine Zahl sein' },
+      { status: 400 }
     )
   }
+
+  const result = await fetchWohnungByIdWithRetry(id)
+  
+  if (!result.success) {
+    console.error('[API] Error response:', result)
+    return NextResponse.json(
+      { 
+        error: result.error,
+        details: result.details
+      },
+      { status: result.status }
+    )
+  }
+  
+  console.log('[API] Success response sent')
+  return NextResponse.json(result.data)
 }

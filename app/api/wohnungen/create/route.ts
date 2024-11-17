@@ -6,19 +6,16 @@ export async function POST(request: Request) {
     const data = await request.json()
     console.log('Received data:', data)
     
-    // Zuerst den User erstellen
+    // Erstelle den User mit den Kontaktdaten
     const user = await prisma.user.create({
-      data: {}
+      data: {
+        name: data.name,
+        email: data.email,
+        telefon: data.telefon
+      }
     })
 
     console.log('Created user:', user)
-    
-    // Berechne die Gesamtmiete
-    const gesamtmiete = 
-      (data.kaltmiete || 0) + 
-      (data.nebenkosten || 0) + 
-      (data.stromkosten || 0) + 
-      (data.heizkosten || 0)
 
     const wohnung = await prisma.wohnung.create({
       data: {
@@ -30,14 +27,16 @@ export async function POST(request: Request) {
         stadt: data.stadt,
         flaeche: parseFloat(data.flaeche),
         zimmer: parseInt(data.zimmer),
-        miete: gesamtmiete,
-        userId: user.id, // Verwende die ID des gerade erstellten Users
-        bilder: data.bilder || []
+        miete: parseFloat(data.kaltmiete),
+        userId: user.id,
+        bilder: data.bilder || [],
+        stellplatz: data.stellplatz || false,
+        updatedAt: new Date()
       }
     })
 
     console.log('Created wohnung:', wohnung)
-    return NextResponse.json({ user, wohnung })
+    return NextResponse.json({ success: true, user, wohnung })
   } catch (error) {
     console.error('Error creating wohnung:', error)
     if (error instanceof Error) {
@@ -47,7 +46,11 @@ export async function POST(request: Request) {
       })
     }
     return NextResponse.json(
-      { error: 'Internal Server Error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { 
+        success: false, 
+        error: 'Internal Server Error', 
+        details: error instanceof Error ? error.message : 'Unknown error' 
+      },
       { status: 500 }
     )
   }

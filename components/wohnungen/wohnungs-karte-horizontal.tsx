@@ -10,23 +10,11 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { Building, Square, CarFront, Euro } from "lucide-react";
+import { Square, CarFront, Euro, Bed } from "lucide-react";
+import { WohnungResponse } from "@/types";
 
 interface WohnungProps {
-  wohnung: {
-    id: string;
-    titel: string;
-    beschreibung: string | null;
-    strasse: string;
-    hausnummer: string;
-    plz: string;
-    stadt: string;
-    flaeche: number;
-    zimmer: number;
-    miete: number;
-    bilder: string[];
-    stellplatz: boolean;
-  };
+  wohnung: WohnungResponse;
 }
 
 export default function WohnungsCardHorizontal({ wohnung }: WohnungProps) {
@@ -65,7 +53,7 @@ export default function WohnungsCardHorizontal({ wohnung }: WohnungProps) {
           src={bilder[0] || "/placeholder.jpg"}
           alt={titel}
           fill
-          className="object-cover rounded-l-lg"
+          className="object-cover rounded-l-lg hover:scale-110 transition-transform duration-700 ease-in-out"
           sizes="(max-width: 768px) 100vw, 33vw"
         />
       </div>
@@ -87,7 +75,7 @@ export default function WohnungsCardHorizontal({ wohnung }: WohnungProps) {
               <Square className="h-4 w-4" /> {flaeche}m²
             </span>
             <span className="text-sm flex items-center gap-1">
-              <Building className="h-4 w-4" /> {zimmer} Zimmer
+              <Bed className="h-4 w-4" /> {zimmer} Zimmer
             </span>
             <span className="text-sm flex items-center gap-1">
               <Euro className="h-4 w-4" /> {miete}€

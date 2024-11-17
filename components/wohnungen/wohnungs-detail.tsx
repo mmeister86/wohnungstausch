@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { MapPin, Euro, Square, Building, ParkingSquare, ChevronLeft, ChevronRight } from 'lucide-react'
+import { MapPin, Euro, Square, ParkingSquare, ChevronLeft, ChevronRight, Bed } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
 import { geocodeAddress } from '@/lib/geocoding'
@@ -35,7 +35,7 @@ interface WohnungsDetailProps {
   }
 }
 
-function WohnungsDetailSkeleton() {
+export function WohnungsDetailSkeleton() {
   return (
     <Card className="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-lg">
       <CardHeader>
@@ -227,7 +227,7 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
             <span className="text-lg">{flaeche} m²</span>
           </div>
           <div className="flex items-center space-x-2">
-            <Building className="w-5 h-5 text-emerald-600" />
+            <Bed className="w-5 h-5 text-emerald-600" />
             <span className="text-lg">{zimmer} Zimmer</span>
           </div>
           <div className="flex items-center space-x-2">
@@ -251,19 +251,26 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
         {/* Karte */}
         <div className="mt-6">
           <h3 className="text-lg font-semibold mb-2">Standort</h3>
-          {mapLoaded && (
+          {mapLoaded ? (
             <div className="h-[400px] rounded-lg overflow-hidden">
               {geocodingError ? (
                 <div className="flex items-center justify-center h-full bg-gray-100 text-gray-500">
                   {geocodingError}
                 </div>
+              ) : !coordinates ? (
+                <div className="flex items-center justify-center h-full bg-gray-100">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-gray-600">Karte wird geladen...</p>
+                  </div>
+                </div>
               ) : (
-                <PermanentLocationsMap 
-                  currentApartmentCoordinates={coordinates ?? undefined}
+                <PermanentLocationsMap
+                  currentApartmentCoordinates={coordinates}
                 />
               )}
             </div>
-          )}
+          ) : null}
         </div>
 
         {/* Kontakt */}

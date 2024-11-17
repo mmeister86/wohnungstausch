@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,33 +11,40 @@ datasource db {
 model User {
   id        String    @id @default(cuid())
   name      String?
-  email     String?   @unique
+  email     String?
   telefon   String?
   wohnungen Wohnung[]
 }
 
 model Wohnung {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  titel       String
+  id           Int       @id @default(autoincrement())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime
+  titel        String
   beschreibung String?
-  strasse     String
-  hausnummer  String
-  plz         String
-  stadt       String
-  flaeche     Float
-  zimmer      Int
-  miete       Float
-  stellplatz  Boolean  @default(false)
-  userId      String
-  bilder      String[]
-  user        User     @relation(fields: [userId], references: [id])
-  location    Location?
+  strasse      String
+  hausnummer   String
+  plz          String
+  stadt        String
+  flaeche      Float
+  zimmer       Int
+  miete        Float
+  userId       String
+  bilder       String[]
+  stellplatz   Boolean   @default(false)
+  location     Location?
+  user         User      @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+  @@index([miete])
+  @@index([zimmer])
+  @@index([flaeche])
+  @@index([userId])
+  @@index([stellplatz])
 }
 
 model Location {
-  coordinates Json  // Alternativ können Sie einen spezifischen GeoJSON-Typ verwenden
-  wohnung     Wohnung @relation(fields: [wohnungId], references: [id])
+  coordinates Json
   wohnungId   Int     @unique
+  wohnung     Wohnung @relation(fields: [wohnungId], references: [id])
 }
