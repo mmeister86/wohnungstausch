@@ -19,6 +19,7 @@ import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import { geocodeAddress } from "@/lib/geocoding";
 import Loader from "../ui/Loader";
+import { useAuth } from "@/lib/auth-context";
 
 const PermanentLocationsMap = dynamic(
   () => import("@/components/permanent-locations-map"),
@@ -106,6 +107,9 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
   const [geocodingError, setGeocodingError] = useState<string | null>(null);
+  const { user } = useAuth();
+
+  const isOwner = user && wohnung?.user?.email === user.email;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -152,7 +156,6 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
     zimmer,
     miete,
     bilder,
-    user,
     stellplatz,
   } = wohnung;
   console.log("Wohnung object:", wohnung);
@@ -172,13 +175,15 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="text-2xl font-bold">{titel}</CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-black dark:text-white"
-          >
-            <Pencil className="w-4 h-4 mr-1" /> Bearbeiten
-          </Button>
+          {isOwner && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-black dark:text-white"
+            >
+              <Pencil className="w-4 h-4 mr-1" /> Bearbeiten
+            </Button>
+          )}
         </div>
         <div className="flex items-center text-gray-600 dark:text-gray-300 mt-2">
           <MapPin className="w-5 h-5 mr-2" />
@@ -327,6 +332,23 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
           </div>
         )}
 
+        {/* Bearbeiten Button */}
+        {isOwner && (
+          <div className="mt-4">
+            <Button
+              variant="outline"
+              className="flex items-center space-x-2"
+              onClick={() => {
+                // TODO: Implement edit functionality
+                console.log("Edit clicked");
+              }}
+            >
+              <Pencil className="w-4 h-4" />
+              <span>Bearbeiten</span>
+            </Button>
+          </div>
+        )}
+
         {/* Karte */}
         <div className="mt-6">
           <h3 className="text-lg font-semibold mb-2">Standort</h3>
@@ -346,10 +368,9 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
                 />
               )}
             </div>
-                  ) : null}
-                  <p className="text-xs text-gray-600 dark:text-gray-400 pt-6">* die hier dargestellten Routen werden automatisch generiert. Das sind nicht zwingend die kürzesten Wege zur Dienststelle, aber sie geben einen ersten Anhalt zur Orientierung.</p>
+          ) : null}
+          <p className="text-xs text-gray-600 dark:text-gray-400 pt-6">* die hier dargestellten Routen werden automatisch generiert. Das sind nicht zwingend die kürzesten Wege zur Dienststelle, aber sie geben einen ersten Anhalt zur Orientierung.</p>
         </div>
-
       </CardContent>
     </Card>
   );

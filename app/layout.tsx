@@ -6,6 +6,7 @@ import Footer from "@/components/footer";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "@/components/ui/toaster";
 import StyledComponentsRegistry from '@/lib/registry';
+import { AuthProvider } from "@/lib/auth-context";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,13 +34,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-      <Header />
-        <StyledComponentsRegistry>
-          {children}
-        </StyledComponentsRegistry>
-        <SpeedInsights />
-      <Footer />
-      <Toaster />
+        <AuthProvider>
+          <Header />
+          <StyledComponentsRegistry>
+            {children}
+          </StyledComponentsRegistry>
+          <SpeedInsights />
+          <Footer />
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );

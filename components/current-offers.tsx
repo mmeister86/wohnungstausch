@@ -50,12 +50,12 @@ export default function CurrentOffers() {
   React.useEffect(() => {
     const fetchWohnungen = async () => {
       try {
-        const response = await fetch('/api/wohnungen')
+        const response = await fetch('/api/wohnungen?limit=6')
         if (!response.ok) {
           throw new Error('Fehler beim Laden der Wohnungen')
         }
         const { data } = await response.json()
-        setWohnungen(data.slice(0, 6)) // Get only the 6 most recent apartments
+        setWohnungen(data)
       } catch (err) {
         console.error('Error fetching apartments:', err)
       } finally {

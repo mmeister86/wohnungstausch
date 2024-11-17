@@ -3,10 +3,28 @@
 import WohnungstauschFormular from "@/components/wohnungen/wohnungs-formular";
 import WohnungsFormularTipps from "@/components/wohnungen/wohnungs-formular-tipps";
 import { WohnungsFormularSkeleton, WohnungsFormularTippsSkeleton } from "@/components/wohnungen/wohnungs-formular-skeleton";
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
 
 const CreatePage = () => {
   const [activeField, setActiveField] = useState<string | null>(null);
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth?redirectTo=/create');
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return <WohnungsFormularSkeleton />;
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="container flex mx-auto py-8 gap-4">

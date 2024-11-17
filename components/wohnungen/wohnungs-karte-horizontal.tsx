@@ -1,12 +1,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  Card
 } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,6 +13,11 @@ interface WohnungProps {
 }
 
 export default function WohnungsCardHorizontal({ wohnung }: WohnungProps) {
+  // Frühe Rückgabe, wenn wohnung undefined ist
+  if (!wohnung) {
+    return null;
+  }
+
   const {
     id,
     titel,
@@ -41,81 +41,85 @@ export default function WohnungsCardHorizontal({ wohnung }: WohnungProps) {
       : text;
   };
 
-  // Frühe Rückgabe, wenn wohnung undefined ist
-  if (!wohnung) {
-    return null;
-  }
-
   return (
     <Card className="flex flex-row hover:shadow-lg transition-shadow duration-300 overflow-hidden">
       <div className="relative w-1/3 min-h-[200px] rounded-l-lg overflow-hidden">
+        <div className="w-full h-full hover:scale-110 transition-transform duration-700 ease-in-out">
         {bilder && bilder.length > 0 ? (
           <Image
             src={bilder[0]}
             alt={titel}
             fill
-            className="object-cover rounded-l-lg hover:scale-110 transition-transform duration-700 ease-in-out"
-            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             onError={(e) => {
-              // Wenn das Bild nicht geladen werden kann, zeige den Platzhalter
-              const target = e.target as HTMLElement;
-              target.style.display = 'none';
-              const parent = target.parentElement;
-              if (parent && !parent.querySelector('.placeholder-icon')) {
-                parent.classList.add('bg-gray-200', 'dark:bg-gray-700', 'flex', 'items-center', 'justify-center');
-                const placeholder = document.createElement('div');
-                placeholder.className = 'placeholder-icon';
-                placeholder.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 dark:text-gray-500"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`;
-                parent.appendChild(placeholder);
+              const imgElement = e.target as HTMLImageElement;
+              imgElement.style.display = 'none';
+              const parentDiv = imgElement.parentElement;
+              if (parentDiv && !parentDiv.querySelector('.fallback-icon')) {
+                parentDiv.classList.add('bg-gray-200', 'dark:bg-gray-700', 'flex', 'items-center', 'justify-center');
+                const fallbackIcon = document.createElement('div');
+                fallbackIcon.classList.add('fallback-icon');
+                fallbackIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+                parentDiv.appendChild(fallbackIcon);
               }
             }}
           />
         ) : (
           <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-            <Home className="w-12 h-12 text-gray-400 dark:text-gray-500" />
+            <House className="w-12 h-12 text-gray-400" />
           </div>
         )}
+        </div>
       </div>
+
       <div className="w-2/3 flex flex-col p-3">
-        <CardHeader className="py-2 px-0">
-          <div className="flex justify-between items-start">
-            <CardTitle className="text-lg font-bold">{titel}</CardTitle>
-          </div>
-          <CardDescription className="text-sm">{adresse}</CardDescription>
-          {beschreibung && (
-            <CardDescription className="text-sm mt-1 text-gray-800">
-              {truncateText(beschreibung, 100)}
-            </CardDescription>
-          )}
-        </CardHeader>
-        <CardContent className="py-2 px-0">
+        <div className="py-2 px-0">
+          <h3 className="text-lg font-semibold mb-1 text-black dark:text-white">
+            {titel}
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            {adresse}
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {truncateText(beschreibung, 100)}
+          </p>
+        </div>
+
+        <div className="py-2 px-0">
           <div className="flex gap-4">
-            <span className="text-sm flex items-center gap-1">
-              <House className="h-4 w-4" /> {flaeche}m²
-            </span>
-            <span className="text-sm flex items-center gap-1">
-              <Bed className="h-4 w-4" /> {zimmer} Zimmer
-            </span>
-            <span className="text-sm flex items-center gap-1">
-              <Euro className="h-4 w-4" /> {miete}€
-            </span>
-            <span className="text-sm flex items-center gap-1">
+            <div className="flex items-center gap-1">
+              <Euro className="w-4 h-4 text-emerald-600" />
+              <span className="text-sm">{miete} €</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Home className="w-4 h-4 text-emerald-600" />
+              <span className="text-sm">{flaeche} m²</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Bed className="w-4 h-4 text-emerald-600" />
+              <span className="text-sm">{zimmer} Zimmer</span>
+            </div>
+            <div className="flex items-center gap-1">
               {stellplatz ? (
-                <CheckCircle className="h-4 w-4 text-green-600" />
+                <CheckCircle className="w-4 h-4 text-green-600" />
               ) : (
-                <Ban className="h-4 w-4 text-red-600" />
+                <Ban className="w-4 h-4 text-red-600" />
               )}
-              {stellplatz ? "inkl. Stellplatz" : "ohne Stellplatz"}
-            </span>
+              <span className="text-sm">
+                {stellplatz ? "Stellplatz" : "Kein Stellplatz"}
+              </span>
+            </div>
           </div>
-        </CardContent>
-        <CardFooter className="mt-auto py-2 px-0">
-          <Link href={`/wohnungen/${id}`} className="w-full">
-            <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 shadow-md hover:shadow-lg">
-              Details
+        </div>
+
+        <div className="mt-auto py-2 px-0">
+          <Link href={`/wohnungen/${id}`}>
+            <Button  className="w-full bg-green-600 hover:bg-green-700">
+              Details anzeigen
             </Button>
           </Link>
-        </CardFooter>
+        </div>
       </div>
     </Card>
   );
