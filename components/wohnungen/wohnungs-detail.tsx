@@ -336,22 +336,6 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
           </div>
         )}
 
-        {/* Bearbeiten Button */}
-        {isOwner && (
-          <div className="mt-4">
-            <Button
-              variant="outline"
-              className="flex items-center space-x-2"
-              onClick={() => {
-                // TODO: Implement edit functionality
-                console.log("Edit clicked");
-              }}
-            >
-              <Pencil className="w-4 h-4" />
-              <span>Bearbeiten</span>
-            </Button>
-          </div>
-        )}
 
         {/* Karte */}
         <div className="mt-6">

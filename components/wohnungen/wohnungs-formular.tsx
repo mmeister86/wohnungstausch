@@ -46,7 +46,6 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
   const { user, session } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [photos, setPhotos] = useState<File[]>([])
-  const [activeField, setActiveField] = useState<FormField | null>(null)
   const [formData, setFormData] = useState<FormData>({
     titel: '',
     beschreibung: '',
@@ -60,20 +59,19 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
     nebenkosten: 0,
     stromkosten: 0,
     heizkosten: 0,
-    name: user?.name || '',
+    name: '',
     telefon: '',
     email: user?.email || '',
     dienstgrad: '',
     stellplatz: false
   })
+  const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormData, string>>>({})
 
   const handleInputFocus = (fieldName: FormField) => {
-    setActiveField(fieldName);
     onFieldFocus?.(fieldName);
   }
 
   const handleInputBlur = () => {
-    setActiveField(null);
     onFieldFocus?.(null);
   }
 
@@ -232,10 +230,16 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
       [name]: value
     }))
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(e.target.value)) {
-      // Hier könnte man einen Fehler-State setzen und dem Benutzer anzeigen
+    if (!emailRegex.test(value)) {
+      setFormErrors(prev => ({
+        ...prev,
+        email: 'Bitte geben Sie eine gültige E-Mail-Adresse ein'
+      }))
     } else {
-      // Hier könnte man den Fehler-State zurücksetzen
+      setFormErrors(prev => ({
+        ...prev,
+        email: undefined
+      }))
     }
   }
 
@@ -673,16 +677,18 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
                   E-Mail *
                 </Label>
                 <Input
+                  type="email"
                   id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleEmailChange}
                   onFocus={() => handleInputFocus('email')}
                   onBlur={handleInputBlur}
-                  type="email"
-                  placeholder="ihre.email@example.com"
-                  className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                  className={formErrors.email ? 'border-red-500' : ''}
                 />
+                {formErrors.email && (
+                  <p className="text-sm text-red-500">{formErrors.email}</p>
+                )}
               </div>
             </div>
 

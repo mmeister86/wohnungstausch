@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { 
+import {
   Drawer,
   DrawerContent,
   DrawerHeader,
@@ -15,27 +15,8 @@ import {
 } from "@/components/ui/drawer"
 import { WohnungsCard } from "./wohnungen/wohnungs-card"
 import { Skeleton } from "@/components/ui/skeleton"
-
-interface Wohnung {
-  id: number;
-  titel: string;
-  beschreibung: string | null;
-  strasse: string;
-  hausnummer: string;
-  plz: string;
-  stadt: string;
-  miete: number;
-  flaeche: number;
-  zimmer: number;
-  stellplatz: boolean;
-  bilder?: string[];
-  userId: string; 
-  user: {
-    name: string | null;
-    email: string | null;
-    telefon: string | null;
-  };
-}
+import { useWohnungen } from "@/lib/wohnungen-context"
+import type { Wohnung } from "@/types/wohnung"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -84,8 +65,8 @@ export default function Header() {
                 </DrawerContent>
               </Drawer>
             )}
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="h-8 px-4 text-sm font-medium"
               onClick={handleAuth}
             >
@@ -128,8 +109,8 @@ export default function Header() {
                     </DrawerContent>
                   </Drawer>
                 )}
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full h-8 px-4 text-sm font-medium"
                   onClick={handleAuth}
                 >
@@ -156,25 +137,42 @@ function MeineWohnungenSkeleton() {
     <div className="space-y-4">
       {[...Array(3)].map((_, index) => (
         <div key={index} className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-          <Skeleton className="w-full h-48" />
-          <div className="p-4 space-y-4">
+          {/* Bild */}
+          <div className="w-full h-48">
+            <Skeleton className="w-full h-full" />
+          </div>
+          
+          <div className="p-4">
             {/* Titel */}
-            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-7 w-3/4 mb-2" />
             
             {/* Adresse */}
-            <div className="flex items-center space-x-2">
-              <Skeleton className="w-4 h-4" />
-              <Skeleton className="h-4 w-2/3" />
+            <div className="flex items-center mb-2">
+              <Skeleton className="w-4 h-4 mr-1" />
+              <Skeleton className="h-5 w-2/3" />
             </div>
             
-            {/* Details */}
-            <div className="grid grid-cols-2 gap-2">
+            {/* Details Grid */}
+            <div className="grid grid-cols-2 gap-2 mb-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="flex items-center space-x-2">
-                  <Skeleton className="w-4 h-4" />
-                  <Skeleton className="h-4 w-16" />
+                <div key={i} className="flex items-center">
+                  <Skeleton className="w-4 h-4 mr-1" />
+                  <Skeleton className="h-5 w-20" />
                 </div>
               ))}
+            </div>
+
+            {/* Kontakt */}
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <Skeleton className="h-6 w-24 mb-2" />
+              <div className="space-y-2">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex items-center">
+                    <Skeleton className="w-16 h-4 mr-2" />
+                    <Skeleton className="h-4 w-40" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -184,24 +182,34 @@ function MeineWohnungenSkeleton() {
 }
 
 function MeineWohnungen() {
-  const [wohnungen, setWohnungen] = useState<Wohnung[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const { wohnungen, setWohnungen, lastFetch, setLastFetch } = useWohnungen();
 
   useEffect(() => {
     async function fetchWohnungen() {
       try {
-        setLoading(true);
-        setError(null);
-
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user?.id) {
           setError('Bitte melden Sie sich an, um Ihre Wohnungen zu sehen.');
           return;
         }
 
-        const { data: wohnungen, error: wohnungError } = await supabase
+        // Prüfen ob die Daten im Cache sind und nicht älter als 5 Minuten
+        const now = Date.now();
+        const cacheAge = lastFetch ? now - lastFetch : Infinity;
+        const maxCacheAge = 5 * 60 * 1000; // 5 Minuten
+
+        // Wenn wir gültige Cache-Daten haben, nichts tun
+        if (wohnungen && cacheAge < maxCacheAge) {
+          return;
+        }
+
+        // Nur loading setzen, wenn wir tatsächlich laden müssen
+        setLoading(true);
+
+        const { data: wohnungenData, error: wohnungError } = await supabase
           .from('Wohnung')
           .select(`
             id,
@@ -217,15 +225,15 @@ function MeineWohnungen() {
             stellplatz,
             bilder,
             userId,
-            user:User (
-              id,
+            user:User!inner (
               email,
               name,
               telefon
             )
           `)
           .eq('userId', session.user.id)
-          .order('createdAt', { ascending: false });
+          .order('createdAt', { ascending: false })
+          .returns<Wohnung[]>();
 
         if (wohnungError) {
           console.error('Error fetching wohnungen:', wohnungError);
@@ -233,7 +241,8 @@ function MeineWohnungen() {
           return;
         }
 
-        setWohnungen(wohnungen || []);
+        setWohnungen(wohnungenData || []);
+        setLastFetch(now);
       } catch (error) {
         console.error('Unexpected error:', error);
         setError('Ein unerwarteter Fehler ist aufgetreten.');
@@ -243,7 +252,7 @@ function MeineWohnungen() {
     }
 
     fetchWohnungen();
-  }, [user]);
+  }, [user, setWohnungen, setLastFetch, wohnungen, lastFetch]);
 
   if (loading) {
     return <MeineWohnungenSkeleton />;
@@ -257,7 +266,7 @@ function MeineWohnungen() {
     );
   }
 
-  if (wohnungen.length === 0) {
+  if (!wohnungen || wohnungen.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
         Sie haben noch keine Wohnungen eingestellt.
@@ -268,7 +277,9 @@ function MeineWohnungen() {
   return (
     <div className="space-y-4">
       {wohnungen.map((wohnung) => (
-        <WohnungsCard key={wohnung.id} wohnung={wohnung} />
+        <div key={wohnung.id} className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+          <WohnungsCard wohnung={wohnung} />
+        </div>
       ))}
     </div>
   );
