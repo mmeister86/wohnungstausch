@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface WohnungsKontaktProps {
   user?: {
@@ -16,14 +17,14 @@ export function WohnungsKontaktSkeleton() {
     <Card className="bg-white dark:bg-gray-700/50 rounded-lg">
       <CardHeader>
         <CardTitle className="text-xl font-semibold">
-          <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <Skeleton className="h-6 w-24" />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {[...Array(3)].map((_, index) => (
           <div key={index} className="flex items-center">
-            <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mr-2" />
-            <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <Skeleton className="h-5 w-20 mr-2" />
+            <Skeleton className="h-5 w-32" />
           </div>
         ))}
       </CardContent>

@@ -14,6 +14,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 import { WohnungsCard } from "./wohnungen/wohnungs-card"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface Wohnung {
   id: number;
@@ -150,6 +151,38 @@ export default function Header() {
   )
 }
 
+function MeineWohnungenSkeleton() {
+  return (
+    <div className="space-y-4">
+      {[...Array(3)].map((_, index) => (
+        <div key={index} className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+          <Skeleton className="w-full h-48" />
+          <div className="p-4 space-y-4">
+            {/* Titel */}
+            <Skeleton className="h-6 w-3/4" />
+            
+            {/* Adresse */}
+            <div className="flex items-center space-x-2">
+              <Skeleton className="w-4 h-4" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+            
+            {/* Details */}
+            <div className="grid grid-cols-2 gap-2">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex items-center space-x-2">
+                  <Skeleton className="w-4 h-4" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function MeineWohnungen() {
   const [wohnungen, setWohnungen] = useState<Wohnung[]>([]);
   const [loading, setLoading] = useState(true);
@@ -213,11 +246,7 @@ function MeineWohnungen() {
   }, [user]);
 
   if (loading) {
-    return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-      </div>
-    );
+    return <MeineWohnungenSkeleton />;
   }
 
   if (error) {

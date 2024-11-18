@@ -4,40 +4,41 @@ import { useSearchParams } from "next/navigation";
 import { WohnungResponse, PaginationResult } from "@/types";
 import { WohnungsCard } from "./wohnungs-card";
 import Pagination from "./pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function WohnungsCardSkeleton() {
   return (
     <div className="hover:shadow-lg transition-shadow duration-300">
       <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-        <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+        <Skeleton className="w-full h-48" />
         <div className="p-4 space-y-4">
           {/* Titel */}
-          <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <Skeleton className="h-6 w-3/4" />
           
           {/* Adresse */}
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-            <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <Skeleton className="w-4 h-4" />
+            <Skeleton className="h-4 w-2/3" />
           </div>
           
           {/* Grid mit 4 Items */}
           <div className="grid grid-cols-2 gap-2 mb-4">
             {[...Array(4)].map((_, index) => (
               <div key={index} className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                <Skeleton className="w-4 h-4" />
+                <Skeleton className="h-4 w-16" />
               </div>
             ))}
           </div>
           
           {/* Kontakt Sektion */}
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+            <Skeleton className="h-5 w-20 mb-2" />
             <div className="space-y-2">
               {[...Array(3)].map((_, index) => (
                 <div key={index} className="flex items-center space-x-2">
-                  <div className="w-16 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                  <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <Skeleton className="w-16 h-4" />
+                  <Skeleton className="h-4 w-32" />
                 </div>
               ))}
             </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   MapPin,
   Euro,
@@ -52,24 +53,24 @@ export function WohnungsDetailSkeleton() {
   return (
     <Card className="w-full bg-white dark:bg-gray-800 rounded-lg">
       <CardHeader>
-        <div className="h-8 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        <Skeleton className="h-8 w-3/4" />
         <div className="flex items-center mt-2">
-          <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded mr-2 animate-pulse" />
-          <div className="h-5 w-1/2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <Skeleton className="w-5 h-5 mr-2" />
+          <Skeleton className="h-5 w-1/2" />
         </div>
       </CardHeader>
 
       <CardContent className="space-y-8">
         {/* Bildergalerie Skeleton */}
         <div className="space-y-4">
-          <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          <Skeleton className="relative aspect-video w-full overflow-hidden rounded-lg" />
 
           {/* Thumbnail Carousel Skeleton */}
           <div className="flex gap-2">
             {[...Array(4)].map((_, index) => (
-              <div
+              <Skeleton
                 key={index}
-                className="flex-shrink-0 w-24 h-24 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse"
+                className="flex-shrink-0 w-24 h-24 rounded-lg"
               />
             ))}
           </div>
@@ -79,19 +80,22 @@ export function WohnungsDetailSkeleton() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, index) => (
             <div key={index} className="flex items-center space-x-2">
-              <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-              <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              <Skeleton className="w-8 h-8" />
+              <div className="flex-1">
+                <Skeleton className="h-4 w-full mb-1" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
             </div>
           ))}
         </div>
 
         {/* Beschreibung Skeleton */}
-        <div className="space-y-4">
-          <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-1/4" />
           <div className="space-y-2">
-            <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-            <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-            <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+            <Skeleton className="h-4 w-4/5" />
           </div>
         </div>
 

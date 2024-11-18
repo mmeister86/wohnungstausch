@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from '@/lib/auth-context'
 
 interface FormData {
   titel: string;
@@ -42,6 +43,7 @@ interface WohnungstauschFormularProps {
 const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormularProps) => {
   const router = useRouter()
   const { toast } = useToast()
+  const { user, session } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [photos, setPhotos] = useState<File[]>([])
   const [activeField, setActiveField] = useState<FormField | null>(null)
@@ -58,9 +60,9 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
     nebenkosten: 0,
     stromkosten: 0,
     heizkosten: 0,
-    name: '',
+    name: user?.name || '',
     telefon: '',
-    email: '',
+    email: user?.email || '',
     dienstgrad: '',
     stellplatz: false
   })
@@ -94,10 +96,20 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Validiere required fields
-    const requiredFields: FormField[] = ['titel', 'strasse', 'hausnummer', 'plz', 'stadt', 'flaeche', 'zimmer', 'kaltmiete', 'name', 'email']
+    if (!session || !user) {
+      toast({
+        variant: "destructive",
+        title: "Nicht eingeloggt",
+        description: "Bitte melden Sie sich an, um eine Wohnung zu erstellen.",
+      })
+      setIsSubmitting(false)
+      return
+    }
+
+    // Validate required fields
+    const requiredFields: (keyof FormData)[] = ['titel', 'strasse', 'hausnummer', 'plz', 'stadt', 'flaeche', 'zimmer', 'kaltmiete', 'name', 'email']
     const missingFields = requiredFields.filter(field => !formData[field])
-    
+
     if (missingFields.length > 0) {
       toast({
         variant: "destructive",
@@ -138,19 +150,22 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
         },
+        credentials: 'include',
         body: JSON.stringify({
           ...numericFormData,
           bilder: base64Images,
         }),
       })
 
-      const responseData = await response.json()
-
       if (!response.ok) {
-        console.error('Error response:', responseData)
-        throw new Error(responseData.details || 'Fehler beim Speichern der Wohnung')
+        const errorData = await response.json()
+        console.error('Server response:', errorData)
+        throw new Error(errorData.details || errorData.error || 'Fehler beim Speichern der Wohnung')
       }
+
+      const responseData = await response.json()
 
       if (!responseData.success) {
         throw new Error(responseData.error || 'Fehler beim Speichern der Wohnung')
@@ -235,6 +250,7 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
     <Card className={`w-full max-w-6xl mx-auto overflow-hidden relative ${className}`}>
       <CardHeader>
         <CardTitle className="text-gray-800 dark:text-gray-100">Wohnungstausch Anzeige erstellen</CardTitle>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Felder mit * sind Pflichtfelder</p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6 md:space-y-0 md:grid md:grid-cols-[1fr,1fr] md:gap-6 md:divide-x md:divide-gray-200">
@@ -244,7 +260,7 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
                 htmlFor="titel"
                 className="text-gray-700 dark:text-gray-200"
               >
-                Titel der Anzeige
+                Titel der Anzeige *
               </Label>
               <Input
                 id="titel"
@@ -281,7 +297,7 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
               <Label
                 className="text-gray-700 dark:text-gray-200"
               >
-                Adresse der Wohnung
+                Adresse der Wohnung *
               </Label>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -343,7 +359,7 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
                   htmlFor="flaeche"
                   className="text-gray-700 dark:text-gray-200"
                 >
-                  Größe der Wohnung (m²)
+                  Größe der Wohnung (m²) *
                 </Label>
                 <Input
                   id="flaeche"
@@ -363,7 +379,7 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
                   htmlFor="zimmer"
                   className="text-gray-700 dark:text-gray-200"
                 >
-                  Anzahl Zimmer
+                  Anzahl Zimmer *
                 </Label>
                 <Input
                   id="zimmer"
@@ -415,7 +431,7 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
                     htmlFor="kaltmiete"
                     className="text-gray-700 dark:text-gray-200"
                   >
-                    Kaltmiete (€)
+                    Kaltmiete (€) *
                   </Label>
                   <Input
                     id="kaltmiete"
@@ -617,7 +633,7 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
                   htmlFor="name"
                   className="text-gray-700 dark:text-gray-200"
                 >
-                  Name
+                  Name *
                 </Label>
                 <Input
                   id="name"
@@ -654,7 +670,7 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
                   htmlFor="email"
                   className="text-gray-700 dark:text-gray-200"
                 >
-                  E-Mail-Adresse
+                  E-Mail *
                 </Label>
                 <Input
                   id="email"

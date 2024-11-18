@@ -3,23 +3,23 @@ import * as React from "react"
 import WohnungsCardHorizontal from "@/components/wohnungen/wohnungs-karte-horizontal"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { WohnungResponse } from "@/types"
 
 function WohnungsCardHorizontalSkeleton() {
   return (
     <div className="flex flex-row hover:shadow-lg transition-shadow duration-300 overflow-hidden bg-white dark:bg-gray-800 rounded-lg">
       {/* Bild Skeleton */}
-      <div className="relative w-1/3 min-h-[200px] bg-gray-200 dark:bg-gray-700 rounded-l-lg animate-pulse flex items-center justify-center">
-      </div>
+      <Skeleton className="relative w-1/3 min-h-[200px] rounded-l-lg" />
 
       <div className="w-2/3 flex flex-col p-3">
         <div className="py-2 px-0">
           {/* Titel Skeleton */}
-          <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+          <Skeleton className="h-6 w-3/4 mb-2" />
           {/* Adresse Skeleton */}
-          <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+          <Skeleton className="h-4 w-2/3 mb-2" />
           {/* Beschreibung Skeleton */}
-          <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <Skeleton className="h-4 w-full" />
         </div>
 
         {/* Details Skeleton */}
@@ -27,8 +27,8 @@ function WohnungsCardHorizontalSkeleton() {
           <div className="flex gap-4">
             {[...Array(4)].map((_, index) => (
               <div key={index} className="flex items-center gap-1">
-                <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                <div className="h-4 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                <Skeleton className="w-4 h-4" />
+                <Skeleton className="h-4 w-12" />
               </div>
             ))}
           </div>
@@ -36,7 +36,7 @@ function WohnungsCardHorizontalSkeleton() {
 
         {/* Button Skeleton */}
         <div className="mt-auto py-2 px-0">
-          <div className="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <Skeleton className="w-full h-10" />
         </div>
       </div>
     </div>
