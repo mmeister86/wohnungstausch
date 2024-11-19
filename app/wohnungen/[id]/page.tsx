@@ -49,11 +49,17 @@ export default function WohnungDetailsPage({ params }: WohnungDetailsPageProps) 
   const [wohnung, setWohnung] = useState<Wohnung | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     const fetchWohnung = async () => {
-      setIsLoading(true)
+      // Wenn wir bereits Daten haben, zeigen wir den Refresh-Indikator
+      if (wohnung) {
+        setIsRefreshing(true)
+      } else {
+        setIsLoading(true)
+      }
       setError(null)
       try {
         console.log('Fetching wohnung with ID:', params.id)
@@ -61,6 +67,8 @@ export default function WohnungDetailsPage({ params }: WohnungDetailsPageProps) 
         console.log('Response status:', response.status)
         const data = await response.json()
         console.log('Response data:', data)
+        console.log('Location data:', data.location)
+        console.log('Coordinates:', data.location?.coordinates)
 
         if (!response.ok) {
           if (response.status === 404) {
@@ -93,12 +101,14 @@ export default function WohnungDetailsPage({ params }: WohnungDetailsPageProps) 
         )
       } finally {
         setIsLoading(false)
+        setIsRefreshing(false)
       }
     }
 
     if (params.id) {
       fetchWohnung()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, router])
 
   if (isLoading) {
@@ -133,6 +143,11 @@ export default function WohnungDetailsPage({ params }: WohnungDetailsPageProps) 
         </div>
       ) : wohnung ? (
         <div className="flex flex-col md:flex-row gap-4">
+          {isRefreshing && (
+            <div className="absolute top-0 left-0 w-full h-1">
+              <div className="h-full bg-green-600 animate-pulse"></div>
+            </div>
+          )}
           <div className="w-full md:w-3/4">
             <WohnungsDetail wohnung={wohnung} />
           </div>

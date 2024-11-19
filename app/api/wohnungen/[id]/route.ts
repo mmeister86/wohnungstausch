@@ -5,9 +5,48 @@ import { Prisma } from '@prisma/client'
 const MAX_RETRIES = 3
 const RETRY_DELAY = 1000 // 1 Sekunde
 
+interface WohnungLocation {
+  coordinates: any; // You might want to make this more specific based on your data structure
+  wohnungId: number;
+}
+
+interface WohnungUser {
+  name: string;
+  email: string;
+  telefon: string;
+}
+
+interface TransformedWohnung {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  titel: string;
+  beschreibung: string;
+  strasse: string;
+  hausnummer: string;
+  plz: string;
+  stadt: string;
+  flaeche: number;
+  zimmer: number;
+  miete: number;
+  stellplatz: boolean;
+  userId: number;
+  bilder: string[];
+  location?: WohnungLocation;
+  user: WohnungUser;
+}
+
+interface ApiResponse {
+  success: boolean;
+  data?: TransformedWohnung;
+  error?: string;
+  details?: string;
+  status?: number;
+}
+
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-async function fetchWohnungByIdWithRetry(id: number, retries = MAX_RETRIES): Promise<any> {
+async function fetchWohnungByIdWithRetry(id: number, retries = MAX_RETRIES): Promise<ApiResponse> {
   try {
     console.log(`[API] Attempting to fetch wohnung with ID ${id} (attempt ${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`)
 
@@ -33,7 +72,7 @@ async function fetchWohnungByIdWithRetry(id: number, retries = MAX_RETRIES): Pro
     }
 
     // Transform the data to match the expected interface
-    const transformedData = {
+    const transformedData: TransformedWohnung = {
       id: wohnung.id,
       createdAt: wohnung.createdAt.toISOString(),
       updatedAt: wohnung.updatedAt.toISOString(),

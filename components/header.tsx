@@ -16,12 +16,19 @@ import {
 import { WohnungsCard } from "./wohnungen/wohnungs-card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useWohnungen } from "@/lib/wohnungen-context"
-import type { Wohnung } from "@/types/wohnung"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { user } = useAuth()
   const router = useRouter()
+  const { loadWohnungen } = useWohnungen()
+
+  useEffect(() => {
+    if (user?.id) {
+      // Sofort laden, wenn der User eingeloggt ist
+      loadWohnungen(user.id)
+    }
+  }, [user?.id, loadWohnungen])
 
   const handleAuth = async () => {
     if (user) {
@@ -182,79 +189,28 @@ function MeineWohnungenSkeleton() {
 }
 
 function MeineWohnungen() {
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
-  const { wohnungen, setWohnungen, lastFetch, setLastFetch } = useWohnungen();
+  const { wohnungen, loading } = useWohnungen();
 
   useEffect(() => {
-    async function fetchWohnungen() {
+    async function checkSession() {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user?.id) {
           setError('Bitte melden Sie sich an, um Ihre Wohnungen zu sehen.');
-          return;
         }
-
-        // Prüfen ob die Daten im Cache sind und nicht älter als 5 Minuten
-        const now = Date.now();
-        const cacheAge = lastFetch ? now - lastFetch : Infinity;
-        const maxCacheAge = 5 * 60 * 1000; // 5 Minuten
-
-        // Wenn wir gültige Cache-Daten haben, nichts tun
-        if (wohnungen && cacheAge < maxCacheAge) {
-          return;
-        }
-
-        // Nur loading setzen, wenn wir tatsächlich laden müssen
-        setLoading(true);
-
-        const { data: wohnungenData, error: wohnungError } = await supabase
-          .from('Wohnung')
-          .select(`
-            id,
-            titel,
-            beschreibung,
-            strasse,
-            hausnummer,
-            plz,
-            stadt,
-            flaeche,
-            zimmer,
-            miete,
-            stellplatz,
-            bilder,
-            userId,
-            user:User!inner (
-              email,
-              name,
-              telefon
-            )
-          `)
-          .eq('userId', session.user.id)
-          .order('createdAt', { ascending: false })
-          .returns<Wohnung[]>();
-
-        if (wohnungError) {
-          console.error('Error fetching wohnungen:', wohnungError);
-          setError('Fehler beim Laden Ihrer Wohnungen.');
-          return;
-        }
-
-        setWohnungen(wohnungenData || []);
-        setLastFetch(now);
       } catch (error) {
         console.error('Unexpected error:', error);
         setError('Ein unerwarteter Fehler ist aufgetreten.');
-      } finally {
-        setLoading(false);
       }
     }
 
-    fetchWohnungen();
-  }, [user, setWohnungen, setLastFetch, wohnungen, lastFetch]);
+    checkSession();
+  }, [user]);
 
-  if (loading) {
+  // Nur Skeleton anzeigen, wenn wir keine Daten haben und laden
+  if (loading && !wohnungen) {
     return <MeineWohnungenSkeleton />;
   }
 

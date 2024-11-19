@@ -13,10 +13,13 @@ export default function Map({ center, markerIcon }: MapProps) {
   const mapRef = useRef(null)
 
   useEffect(() => {
+    // Store the ref value in a variable that won't change
+    const map = mapRef.current;
+    
     return () => {
-      if (mapRef.current) {
-        // @ts-ignore
-        mapRef.current.remove()
+      if (map) {
+        // @ts-expect-error Leaflet types are not fully compatible
+        map.remove()
       }
     }
   }, [])

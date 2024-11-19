@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -66,6 +66,15 @@ const WohnungstauschFormular = ({ className, onFieldFocus }: WohnungstauschFormu
     stellplatz: false
   })
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormData, string>>>({})
+
+  useEffect(() => {
+    if (user?.email && !formData.email) {
+      setFormData(prev => ({
+        ...prev,
+        email: user.email || ''
+      }))
+    }
+  }, [user, formData.email])
 
   const handleInputFocus = (fieldName: FormField) => {
     onFieldFocus?.(fieldName);

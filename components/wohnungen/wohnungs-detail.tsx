@@ -129,9 +129,10 @@ export default function WohnungsDetail({ wohnung }: WohnungsDetailProps) {
     async function loadCoordinates() {
       try {
         setGeocodingError(null);
-        const result = await geocodeAddress(strasse, hausnummer, plz, stadt);
+        const address = `${strasse} ${hausnummer}, ${plz} ${stadt}, Germany`;
+        const result = await geocodeAddress(address);
         if (result) {
-          setCoordinates([result.lat, result.lon]);
+          setCoordinates(result);
         } else {
           setGeocodingError("Konnte die Adresse nicht finden");
         }
