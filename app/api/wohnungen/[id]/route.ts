@@ -21,7 +21,7 @@ interface TransformedWohnung {
   createdAt: string;
   updatedAt: string;
   titel: string;
-  beschreibung: string;
+  beschreibung?: string;
   strasse: string;
   hausnummer: string;
   plz: string;
@@ -30,7 +30,7 @@ interface TransformedWohnung {
   zimmer: number;
   miete: number;
   stellplatz: boolean;
-  userId: number;
+  userId: string;
   bilder: string[];
   location?: WohnungLocation;
   user: WohnungUser;
@@ -77,7 +77,7 @@ async function fetchWohnungByIdWithRetry(id: number, retries = MAX_RETRIES): Pro
       createdAt: wohnung.createdAt.toISOString(),
       updatedAt: wohnung.updatedAt.toISOString(),
       titel: wohnung.titel,
-      beschreibung: wohnung.beschreibung,
+      ...(wohnung.beschreibung && { beschreibung: wohnung.beschreibung }),
       strasse: wohnung.strasse,
       hausnummer: wohnung.hausnummer,
       plz: wohnung.plz,
@@ -86,12 +86,17 @@ async function fetchWohnungByIdWithRetry(id: number, retries = MAX_RETRIES): Pro
       zimmer: wohnung.zimmer,
       miete: wohnung.miete,
       stellplatz: wohnung.stellplatz,
-      userId: wohnung.userId,
+      userId: String(wohnung.userId),
       bilder: wohnung.bilder || [],
-      location: wohnung.location ? {
-        coordinates: wohnung.location.coordinates,
-        wohnungId: wohnung.location.wohnungId
-      } : undefined,
+      location: wohnung.location && Array.isArray(wohnung.location.coordinates) && 
+        wohnung.location.coordinates.length === 2 && 
+        typeof wohnung.location.coordinates[0] === 'number' && 
+        typeof wohnung.location.coordinates[1] === 'number' 
+        ? {
+            coordinates: wohnung.location.coordinates as [number, number],
+            wohnungId: wohnung.location.wohnungId
+          } 
+        : undefined,
       user: {
         name: wohnung.user?.name || '',
         email: wohnung.user?.email || '',
