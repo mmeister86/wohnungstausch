@@ -1,0 +1,52 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+  output          = "./generated/client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String?
+  email     String?
+  telefon   String?
+  wohnungen Wohnung[]
+}
+
+model Wohnung {
+  id           Int       @id @default(autoincrement())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime
+  titel        String
+  beschreibung String?
+  strasse      String
+  hausnummer   String
+  plz          String
+  stadt        String
+  flaeche      Float
+  zimmer       Int
+  miete        Float
+  userId       String
+  bilder       String[]
+  stellplatz   Boolean   @default(false)
+  location     Location?
+  user         User      @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+  @@index([miete])
+  @@index([zimmer])
+  @@index([flaeche])
+  @@index([userId])
+  @@index([stellplatz])
+}
+
+model Location {
+  coordinates Json
+  wohnungId   Int     @unique
+  wohnung     Wohnung @relation(fields: [wohnungId], references: [id])
+}
