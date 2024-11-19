@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma/edge'
-import { Prisma } from '@prisma/client'
+import { NextResponse, NextRequest } from 'next/server';
+import { prisma } from '@/lib/prisma/edge';
+import { Prisma, Wohnung } from '@prisma/client';
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'edge'
@@ -155,7 +155,7 @@ async function fetchWohnungByIdWithRetry(id: number, retries = MAX_RETRIES): Pro
 }
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   console.log('[API] Received request for wohnung ID:', params.id)

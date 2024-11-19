@@ -1,102 +1,70 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma/edge';
 import { FilterParams, FetchResult, WohnungResponse } from '@/types';
+import { Prisma, Wohnung, User, Location } from '@prisma/client';
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'edge'
 
 const ITEMS_PER_PAGE = 10;
 
-const fetchWohnungenWithFilters = async (filters: FilterParams): Promise<FetchResult> => {
-  const {
-    minPreis,
-    maxPreis,
-    minZimmer,
-    maxZimmer,
-    minFlaeche,
-    maxFlaeche,
-    stellplatz,
-    page = 1,
-    limit = ITEMS_PER_PAGE
-  } = filters;
+type WohnungWithRelations = Wohnung & {
+  location: Location | null
+  user: User
+}
 
-  try {
-    const where = {
-      AND: [
-        minPreis ? { miete: { gte: minPreis } } : {},
-        maxPreis ? { miete: { lte: maxPreis } } : {},
-        minZimmer ? { zimmer: { gte: minZimmer } } : {},
-        maxZimmer ? { zimmer: { lte: maxZimmer } } : {},
-        minFlaeche ? { flaeche: { gte: minFlaeche } } : {},
-        maxFlaeche ? { flaeche: { lte: maxFlaeche } } : {},
-        stellplatz !== undefined ? { stellplatz } : {},
-      ],
-    };
+async function fetchWohnungenWithFilters(
+  filters: FilterParams,
+  page: number = 1
+): Promise<FetchResult> {
+  const skip = (page - 1) * ITEMS_PER_PAGE;
 
-    const [wohnungen, total] = await Promise.all([
-      prisma.wohnung.findMany({
-        where,
-        select: {
-          id: true,
-          titel: true,
-          beschreibung: true,
-          miete: true,
-          flaeche: true,
-          zimmer: true,
-          strasse: true,
-          hausnummer: true,
-          plz: true,
-          stadt: true,
-          bilder: true,
-          stellplatz: true,
-          user: {
-            select: {
-              name: true,
-              email: true,
-              telefon: true,
-            },
-          },
-          location: {
-            select: {
-              coordinates: true
-            }
-          },
-        },
-        skip: (page - 1) * limit,
-        take: limit,
-        orderBy: {
-          createdAt: 'desc',
-        },
-      }),
-      prisma.wohnung.count({ where }),
-    ]);
+  const where: Prisma.WohnungWhereInput = {
+    AND: [
+      filters.minZimmer ? { zimmer: { gte: filters.minZimmer } } : {},
+      filters.maxZimmer ? { zimmer: { lte: filters.maxZimmer } } : {},
+      filters.minFlaeche ? { flaeche: { gte: filters.minFlaeche } } : {},
+      filters.maxFlaeche ? { flaeche: { lte: filters.maxFlaeche } } : {},
+      filters.minPreis ? { miete: { gte: filters.minPreis } } : {},
+      filters.maxPreis ? { miete: { lte: filters.maxPreis } } : {},
+      filters.stellplatz !== undefined ? { stellplatz: filters.stellplatz } : {},
+    ],
+  };
 
-    console.log('Database query results:', { total, fetchedCount: wohnungen.length, where });
-
-    const transformedWohnungen: WohnungResponse[] = wohnungen.map(wohnung => ({
-      ...wohnung,
-      location: wohnung.location ? {
-        coordinates: wohnung.location.coordinates as { lat: number; lon: number }
-      } : undefined
-    }));
-
-    return {
-      success: true,
-      data: transformedWohnungen,
-      pagination: {
-        total,
-        pages: Math.ceil(total / limit),
-        currentPage: page,
+  const [wohnungen, total] = await Promise.all([
+    prisma.wohnung.findMany({
+      where,
+      skip,
+      take: ITEMS_PER_PAGE,
+      include: {
+        location: true,
+        user: true,
       },
-    };
-  } catch (error) {
-    console.error('Error fetching wohnungen:', error);
+    }),
+    prisma.wohnung.count({ where }),
+  ]);
+
+  const transformedWohnungen: WohnungResponse[] = wohnungen.map((w: WohnungWithRelations) => {
+    const coordinates = w.location?.coordinates as { lat: number; lon: number } | undefined;
+    
     return {
-      success: false,
-      error: 'Fehler beim Laden der Wohnungen',
+      ...w,
+      location: coordinates ? { coordinates } : undefined,
+      createdAt: w.createdAt.toISOString(),
+      updatedAt: w.updatedAt.toISOString(),
     };
-  }
-};
+  });
+
+  return {
+    success: true,
+    data: transformedWohnungen,
+    pagination: {
+      total,
+      pages: Math.ceil(total / ITEMS_PER_PAGE),
+      currentPage: page,
+    },
+  };
+}
 
 export async function GET(request: NextRequest) {
   try {
