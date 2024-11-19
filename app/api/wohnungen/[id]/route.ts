@@ -18,7 +18,7 @@ export async function GET(
 
   try {
     const wohnung = await prisma.wohnung.findUnique({
-      where: { id: params.id },
+      where: { id: parseInt(params.id) },
       include: {
         location: true,
         user: true,
