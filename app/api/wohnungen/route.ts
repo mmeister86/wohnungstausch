@@ -2,6 +2,9 @@ import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { FilterParams, FetchResult, WohnungResponse } from '@/types';
 
+export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
+
 const ITEMS_PER_PAGE = 10;
 
 const fetchWohnungenWithFilters = async (filters: FilterParams): Promise<FetchResult> => {

@@ -1,6 +1,9 @@
-import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/db'
 import { Prisma } from '@prisma/client'
+
+export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
 
 const MAX_RETRIES = 3
 const RETRY_DELAY = 1000 // 1 Sekunde
