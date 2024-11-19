@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { FilterParams, FetchResult, WohnungResponse } from '@/types';
 
@@ -95,9 +95,9 @@ const fetchWohnungenWithFilters = async (filters: FilterParams): Promise<FetchRe
   }
 };
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const searchParams = request.nextUrl.searchParams;
     const filters: FilterParams = {
       minPreis: searchParams.get('minPreis') ? Number(searchParams.get('minPreis')) : undefined,
       maxPreis: searchParams.get('maxPreis') ? Number(searchParams.get('maxPreis')) : undefined,

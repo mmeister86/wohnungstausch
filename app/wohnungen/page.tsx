@@ -1,16 +1,18 @@
 import WohnungsGrid from "@/components/wohnungen/wohnungs-grid";
 import Suche from "@/components/wohnungen/wohnungs-suche";
-import React from "react";
+import React, { Suspense } from "react";
 
-const page = () => {
+const WohnungenPage = () => {
   return (
-    <>
-      <div className="bg-gray-50">
+    <div className="bg-gray-50">
+      <Suspense>
         <Suche />
+      </Suspense>
+      <Suspense>
         <WohnungsGrid />
-      </div>
-    </>
+      </Suspense>
+    </div>
   );
 };
 
-export default page;
+export default WohnungenPage;
