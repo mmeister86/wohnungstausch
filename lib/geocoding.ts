@@ -1,8 +1,3 @@
-interface GeocodingResult {
-  lat: number;
-  lon: number;
-}
-
 // Add a delay to prevent rate limiting
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 

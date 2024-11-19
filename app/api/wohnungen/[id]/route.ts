@@ -6,7 +6,7 @@ const MAX_RETRIES = 3
 const RETRY_DELAY = 1000 // 1 Sekunde
 
 interface WohnungLocation {
-  coordinates: any; // You might want to make this more specific based on your data structure
+  coordinates: [number, number]; // Latitude and longitude as a tuple
   wohnungId: number;
 }
 
