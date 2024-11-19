@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma/edge';
-import { Prisma, Wohnung } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'edge'
