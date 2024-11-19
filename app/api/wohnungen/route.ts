@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma/edge';
 import { FilterParams, FetchResult, WohnungResponse } from '@/types';
 
 export const dynamic = 'force-dynamic'

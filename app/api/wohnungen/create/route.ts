@@ -1,9 +1,12 @@
-import { prisma } from '@/lib/db'
-import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma/edge'
+import { NextResponse, NextRequest } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 
-export async function POST(request: Request) {
+export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
+
+export async function POST(request: NextRequest) {
   try {
     const cookieStore = cookies()
     const supabase = createClient(cookieStore)
